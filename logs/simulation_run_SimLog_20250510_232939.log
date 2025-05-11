@@ -1,0 +1,80 @@
+2025-05-10 23:29:39 [INFO ] [SimLog] Logger initialized for overall simulation: SimLog
+2025-05-10 23:29:39 [INFO ] [LabSensor1(dev_1)] Avoiding device LabComposite4
+2025-05-10 23:29:39 [INFO ] [LabSensor1(dev_1)] Avoiding device LabComposite8
+2025-05-10 23:29:39 [INFO ] [LabSensor1(dev_1)] Added 'work_with_me' relationship with LabSensor9
+2025-05-10 23:29:39 [INFO ] [LabActuator2(dev_2)] Added 'back_me' relationship with LabSensor1
+2025-05-10 23:29:39 [INFO ] [LabActuator2(dev_2)] Avoiding device LabSensor9
+2025-05-10 23:29:39 [INFO ] [LabComm3(dev_3)] Added 'back_me' relationship with LabSensor1
+2025-05-10 23:29:39 [INFO ] [LabComm3(dev_3)] Avoiding device LabSensor1
+2025-05-10 23:29:39 [INFO ] [LabComm3(dev_3)] Added 'work_with_me' relationship with LabActuator2
+2025-05-10 23:29:39 [INFO ] [LabComm3(dev_3)] Added 'back_me' relationship with LabComposite4
+2025-05-10 23:29:39 [INFO ] [LabComm3(dev_3)] Avoiding device LabSensor5
+2025-05-10 23:29:39 [INFO ] [LabComm3(dev_3)] Added 'work_with_me' relationship with LabComm7
+2025-05-10 23:29:39 [INFO ] [LabComm3(dev_3)] Added 'work_with_me' relationship with LabComposite8
+2025-05-10 23:29:39 [INFO ] [LabComm3(dev_3)] Avoiding device LabComposite8
+2025-05-10 23:29:39 [INFO ] [LabComposite4(dev_4)] Added 'work_with_me' relationship with LabActuator2
+2025-05-10 23:29:39 [INFO ] [LabComposite4(dev_4)] Avoiding device LabComm3
+2025-05-10 23:29:39 [INFO ] [LabComposite4(dev_4)] Added 'work_with_me' relationship with LabSensor5
+2025-05-10 23:29:39 [INFO ] [LabComposite4(dev_4)] Added 'work_with_me' relationship with LabActuator6
+2025-05-10 23:29:39 [INFO ] [LabComposite4(dev_4)] Added 'work_with_me' relationship with LabComposite8
+2025-05-10 23:29:39 [INFO ] [LabSensor5(dev_5)] Added 'work_with_me' relationship with LabComposite4
+2025-05-10 23:29:39 [INFO ] [LabSensor5(dev_5)] Added 'work_with_me' relationship with LabActuator6
+2025-05-10 23:29:39 [INFO ] [LabSensor5(dev_5)] Added 'back_me' relationship with LabActuator6
+2025-05-10 23:29:39 [INFO ] [LabSensor5(dev_5)] Avoiding device LabComposite8
+2025-05-10 23:29:39 [INFO ] [LabActuator6(dev_6)] Added 'work_with_me' relationship with LabSensor1
+2025-05-10 23:29:39 [INFO ] [LabActuator6(dev_6)] Added 'work_with_me' relationship with LabActuator2
+2025-05-10 23:29:39 [INFO ] [LabActuator6(dev_6)] Added 'back_me' relationship with LabActuator2
+2025-05-10 23:29:39 [INFO ] [LabActuator6(dev_6)] Added 'back_me' relationship with LabComm3
+2025-05-10 23:29:39 [INFO ] [LabActuator6(dev_6)] Added 'back_me' relationship with LabSensor5
+2025-05-10 23:29:39 [INFO ] [LabActuator6(dev_6)] Added 'work_with_me' relationship with LabComm7
+2025-05-10 23:29:39 [INFO ] [LabActuator6(dev_6)] Added 'work_with_me' relationship with LabSensor9
+2025-05-10 23:29:39 [INFO ] [LabActuator6(dev_6)] Added 'back_me' relationship with LabSensor9
+2025-05-10 23:29:39 [INFO ] [LabComm7(dev_7)] Added 'back_me' relationship with LabComm3
+2025-05-10 23:29:39 [INFO ] [LabComm7(dev_7)] Avoiding device LabComposite4
+2025-05-10 23:29:39 [INFO ] [LabComm7(dev_7)] Added 'work_with_me' relationship with LabSensor5
+2025-05-10 23:29:39 [INFO ] [LabComm7(dev_7)] Added 'back_me' relationship with LabComposite8
+2025-05-10 23:29:39 [INFO ] [LabComposite8(dev_8)] Added 'work_with_me' relationship with LabSensor1
+2025-05-10 23:29:39 [INFO ] [LabComposite8(dev_8)] Avoiding device LabSensor1
+2025-05-10 23:29:39 [INFO ] [LabComposite8(dev_8)] Added 'work_with_me' relationship with LabActuator2
+2025-05-10 23:29:39 [INFO ] [LabComposite8(dev_8)] Added 'work_with_me' relationship with LabComm3
+2025-05-10 23:29:39 [INFO ] [LabComposite8(dev_8)] Added 'back_me' relationship with LabComm3
+2025-05-10 23:29:39 [INFO ] [LabComposite8(dev_8)] Added 'back_me' relationship with LabSensor9
+2025-05-10 23:29:39 [INFO ] [LabComposite8(dev_8)] Avoiding device LabSensor9
+2025-05-10 23:29:39 [INFO ] [LabSensor9(dev_9)] Added 'work_with_me' relationship with LabActuator2
+2025-05-10 23:29:39 [INFO ] [LabSensor9(dev_9)] Added 'back_me' relationship with LabActuator2
+2025-05-10 23:29:39 [INFO ] [LabSensor9(dev_9)] Added 'back_me' relationship with LabComm3
+2025-05-10 23:29:39 [INFO ] [LabSensor9(dev_9)] Added 'work_with_me' relationship with LabComposite4
+2025-05-10 23:29:39 [INFO ] [LabSensor9(dev_9)] Added 'back_me' relationship with LabComm7
+2025-05-10 23:29:39 [INFO ] [LabActuator10(dev_10)] Added 'back_me' relationship with LabSensor1
+2025-05-10 23:29:39 [INFO ] [LabActuator10(dev_10)] Added 'back_me' relationship with LabActuator2
+2025-05-10 23:29:39 [INFO ] [LabActuator10(dev_10)] Added 'work_with_me' relationship with LabComm3
+2025-05-10 23:29:39 [INFO ] [LabActuator10(dev_10)] Added 'back_me' relationship with LabSensor5
+2025-05-10 23:29:39 [INFO ] [LabActuator10(dev_10)] Avoiding device LabSensor9
+2025-05-10 23:29:39 [INFO ] [REL_SETUP (Framework ON)] Work:21 | Back:18 | Avoi:12
+2025-05-10 23:29:39 [INFO ] [CYCLE_START] Minute: 0 (SIoT_Framework_ENABLED)
+2025-05-10 23:29:39 [INFO ] [JOB_GEN] New job: Job(id=job_1, wu=0/8, dl=22, status=PENDING, assigned_to=None)
+2025-05-10 23:29:39 [INFO ] [JOB_GEN] New job: Job(id=job_2, wu=0/7, dl=31, status=PENDING, assigned_to=None)
+2025-05-10 23:29:39 [INFO ] [JOB_GEN] New job: Job(id=job_3, wu=0/17, dl=44, status=PENDING, assigned_to=None)
+2025-05-10 23:29:39 [INFO ] [JOB_ASSIGN] Job job_1 assigned to LS1(dev_1)
+2025-05-10 23:29:39 [INFO ] [JOB_ASSIGN] Job job_2 assigned to LA2(dev_2)
+2025-05-10 23:29:39 [INFO ] [JOB_ASSIGN] Job job_3 assigned to LCo4(dev_4)
+2025-05-10 23:29:39 [INFO ] [JOB_PROGRESS] Device LCo4(dev_4) started Job job_3
+2025-05-10 23:29:39 [INFO ] [JOB_PROGRESS] Device LCo4(dev_4) on Job job_3: 1/17 WU. Load: 10
+2025-05-10 23:29:39 [INFO ] [LabComposite8(dev_8)] Provisionally accepted task 'actuate' from LabActuator6 (load_requested: 8)
+2025-05-10 23:29:39 [INFO ] [LabComposite8(dev_8)] Composite LCo8(dev_8) attempting to delegate 'actuate'.
+2025-05-10 23:29:39 [INFO ] [LabComposite8(dev_8)] No suitable worker or sub-device found/succeeded for 'actuate'.
+2025-05-10 23:29:39 [INFO ] [LabComposite8(dev_8)] QoE-Trust (performer for task 'actuate' with LabActuator6): SR QoE:BAD(E:93%,A:0%), RT QoE:FAIR(E:32,A:1ms), LE QoE:BAD(E_eff:1.07,A_eff:0.12 from E_load:8,A_load:1). AvgQoE:0.33. dT:-3.3. New Gen.Trust for LabComposite8:71.7
+2025-05-10 23:29:39 [INFO ] [LabComposite8(dev_8)] Composite LCo8(dev_8) FAILED to manage 'actuate' for LabActuator6. Reason: no_delegate_success
+2025-05-10 23:29:39 [INFO ] [LabActuator6(dev_6)] QoE-Trust (requester for task 'actuate' with LabComposite8): SR QoE:BAD(E:89%,A:0%), RT QoE:BAD(E:47,A:1ms). AvgQoE:0.00. dT:-5.0. New Gen.Trust for LabActuator6:70.0
+2025-05-10 23:29:39 [INFO ] [LabSensor9(dev_9)] Provisionally accepted task 'sense' from LabComm3 (load_requested: 8)
+2025-05-10 23:29:39 [INFO ] [LabSensor9(dev_9)] Sensed temperature: 26.80 (Acc: 0.92) in 21ms, Load: 7
+2025-05-10 23:29:39 [INFO ] [LabSensor9(dev_9)] QoE-Trust (performer for task 'sense' with LabComm3): SR QoE:FAIR(E:93%,A:100%), RT QoE:FAIR(E:51,A:22ms), LE QoE:FAIR(E_eff:1.08,A_eff:0.88 from E_load:8,A_load:7). AvgQoE:1.00. dT:0.0. New Gen.Trust for LabSensor9:75.0
+2025-05-10 23:29:39 [INFO ] [LabSensor9(dev_9)] EXECUTED 'sense' for LabComm3, val: 26.80
+2025-05-10 23:29:39 [INFO ] [LabComm3(dev_3)] QoE-Trust (requester for task 'sense' with LabSensor9): SR QoE:FAIR(E:94%,A:100%), RT QoE:FAIR(E:47,A:22ms). AvgQoE:1.00. dT:0.0. New Gen.Trust for LabComm3:75.0
+2025-05-10 23:29:39 [INFO ] [SIM_INTERACTION] LC3(dev_3) successful 'sense' with LS9(dev_9)
+2025-05-10 23:29:39 [INFO ] [JOB_PROGRESS] Device LA2(dev_2) started Job job_2
+2025-05-10 23:29:39 [INFO ] [JOB_PROGRESS] Device LA2(dev_2) on Job job_2: 1/7 WU. Load: 10
+2025-05-10 23:29:39 [INFO ] [JOB_PROGRESS] Device LS1(dev_1) started Job job_1
+2025-05-10 23:29:39 [INFO ] [JOB_PROGRESS] Device LS1(dev_1) on Job job_1: 1/8 WU. Load: 10
+2025-05-10 23:29:39 [INFO ] [CYCLE_END] Minute: 0 | Pending Jobs: 3
+2025-05-10 23:29:39 [INFO ] [CYCLE_START] Minute: 1 (SIoT_Framework_ENABLED)

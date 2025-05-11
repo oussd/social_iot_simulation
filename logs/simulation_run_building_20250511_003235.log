@@ -1,0 +1,3 @@
+2025-05-11 00:32:35 [INFO ] [building] Logger initialized for overall simulation: building
+2025-05-11 00:32:35 [INFO ] [SIM_SETUP] Target devices: 10. Building sim (ON) with: 1 zones, 8 avg devices/zone. Approx created: 10
+2025-05-11 00:32:35 [INFO ] [BldgSim_FrameworkON] Building Simulation (SIoT_Framework_ENABLED) | Devices: approx 10 | Zones: 1 | Duration: 240m

@@ -1,0 +1,13 @@
+2025-05-10 21:25:07,570 - simulation - INFO - Simulation: Initializing Building Simulation with 10 devices (Negotiation: True)
+2025-05-10 21:25:07,570 - simulation - INFO - Simulation Run: Starting Building Simulation (Negotiation: True) for 1440 minutes.
+2025-05-10 21:25:07,570 - simulation - INFO - Device Creation: Created Sensor1 (sens1) with Balance: 911
+2025-05-10 21:25:07,570 - simulation - INFO - Device Creation: Created Actuator2 (act2) with Balance: 966
+2025-05-10 21:25:07,570 - simulation - INFO - Device Creation: Created CommDev3 (comm3) with Balance: 1010
+2025-05-10 21:25:07,570 - simulation - INFO - Device Creation: Created Composite4 (comp4) with Balance: 1000
+2025-05-10 21:25:07,570 - simulation - INFO - Device Creation: Created Sensor5 (sens5) with Balance: 1027
+2025-05-10 21:25:07,570 - simulation - INFO - Device Creation: Created Actuator6 (act6) with Balance: 1037
+2025-05-10 21:25:07,570 - simulation - INFO - Device Creation: Created CommDev7 (comm7) with Balance: 1070
+2025-05-10 21:25:07,570 - simulation - INFO - Device Creation: Created Composite8 (comp8) with Balance: 1034
+2025-05-10 21:25:07,570 - simulation - INFO - Device Creation: Created Sensor9 (sens9) with Balance: 950
+2025-05-10 21:25:07,570 - simulation - INFO - Device Creation: Created Actuator10 (act10) with Balance: 1022
+2025-05-10 21:25:07,570 - simulation - INFO - Device Distribution: Total Devices: 10 | Sensing: 3 | Actuating: 3 | Communicating: 2 | Composite: 2
