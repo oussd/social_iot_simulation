@@ -1,7 +1,8 @@
 import random
 import time
+import logging # For logging levels
 from enum import Enum
-from ..utils.logger import SimulationLogger
+from typing import List, Dict, Any, Optional
 
 # QoS/QoE ENHANCEMENT: Define QoE Levels
 class QoELevel(Enum):
@@ -10,364 +11,502 @@ class QoELevel(Enum):
     GOOD = 2
 
 class Device:
-    def __init__(self, device_id, name, max_load=100):
+    def __init__(self, device_id: str, name: str, max_load: int = 100, 
+                 framework_variant: str = "full_siot", # "baseline", "social_basic", "full_siot"
+                 capabilities: Optional[List[str]] = None, 
+                 logger_instance=None, 
+                 current_minute_provider=None): # Function to get current sim time
+        
         self.device_id = device_id
         self.name = name
+        self.framework_variant = framework_variant
+        # Ensure capabilities is always a list, even if None is passed
+        self.capabilities = capabilities if capabilities is not None else []
+        
         self.max_load = max_load
         self.current_load = 0
-        self.trust_score = 75.0  # Start with a neutral-to-good general trust score
-        self.relationships = {
+        
+        if self.framework_variant == "baseline":
+            self.trust_score = 50.0 # Static or unused in baseline
+        else: 
+            self.trust_score = 75.0 
+        
+        self.relationships: Dict[str, List[Dict[str, Any]]] = {
             'work_with_me': [], 'work_for_me': [], 'controller_for': [],
             'back_me': [], 'avoid_me': []
         }
         self.policy = {
-            'max_tasks_per_controller': 10, 'max_load_per_controller': 50, 'task_timeout': 300
+            'max_tasks_per_controller': 10, 
+            'max_load_per_controller': 50, 
+            'task_timeout': 300, # seconds
+            'min_trust_for_critical_delegation': 60, # For full_siot
+            'max_failed_interactions_before_avoid': 3, # For full_siot misuse
+            'negotiation_reject_if_own_load_above_percent': 0.75, # For full_siot
         }
-        self.task_log = [] # Consider limiting size if it grows too large
-        self.misuse_count = 0
-        self.blame_count = 0
-        self.controller_tasks = {} # Tracks tasks assigned by this device if it's a controller
-        self.logger = SimulationLogger()
+        self.task_log: List[str] = [] 
+        self.misuse_incidents_flagged = 0 # Specific to full_siot, flagged by this device against others
+        self.blame_count = 0  # When this device is blamed (e.g. for policy violation)
+        
+        # Monetary Attributes
+        self.balance = 1000.0
+        self.min_acceptable_income_threshold = 50.0
+        self.current_period_income = 0.0
+        self.total_income_earned = 0.0
+        self.total_expenses_paid = 0.0
+        self.total_penalties_applied_to_others = 0.0
+        self.total_penalties_received = 0.0
+        self.task_failure_penalty_value = 15.0
+        self.policy_violation_penalty_value = 25.0
 
-        # --- Monetary Attributes ---
-        self.balance = 1000
-        self.min_acceptable_income_threshold = 50
-        self.current_period_income = 0
-        self.total_income_earned = 0
-        self.total_expenses_paid = 0
-        self.total_penalties_applied_to_others = 0
-        self.total_penalties_received = 0
-        self.task_failure_penalty_value = 15
-        self.policy_violation_penalty_value = 25
-
-        # --- QoS/QoE Attributes ---
-        self.announced_qos = { # What this device claims/aims to provide
-            'response_time_ms': float(random.uniform(30, 70)), # Device's typical processing + internal latency
-            'task_success_rate': random.uniform(0.90, 0.99),
-            'load_efficiency': random.uniform(0.9, 1.1), # 1.0 is ideal, >1 uses more load than expected
+        # QoS/QoE Attributes
+        self.announced_qos = { 
+            'response_time_ms': float(random.uniform(30, 70)), 
+            'task_success_rate': random.uniform(0.90, 0.99), # Expected success rate of tasks IT performs
+            'load_efficiency': random.uniform(0.9, 1.1), # 1.0 = uses expected load
         }
-        # What this device expects from others when it's a requester
-        self.expected_partner_qos = {
+        self.expected_partner_qos = { # What this device expects when IT IS THE REQUESTER
             'response_time_ms': float(random.uniform(40, 80)),
-            'task_success_rate': random.uniform(0.85, 0.95),
+            'task_success_rate': random.uniform(0.85, 0.95), # Expected success rate FROM a partner
         }
-        self.qoe_thresholds = { # For |Announced - Measured|
-            'response_time_ms': {'sigma': 25.0, 'delta': 15.0}, # Wider range for response time
-            'task_success_rate': {'sigma': 0.15, 'delta': 0.10}, # For difference from expected success rate
-            'load_efficiency': {'sigma': 0.25, 'delta': 0.15}
+        self.qoe_thresholds = { 
+            'response_time_ms': {'sigma': 25.0, 'delta': 15.0}, 
+            'task_success_rate': {'sigma': 0.15, 'delta': 0.10}, 
+            'load_efficiency': {'sigma': 0.25, 'delta': 0.15},
+            'negotiation_success_binary': {'sigma': 0.1, 'delta': 0.05}, 
+            'policy_adherence_binary': {'sigma': 0.1, 'delta': 0.05},
+            'availability_binary': {'sigma': 0.1, 'delta': 0.05} # For overload rejections
         }
-        self.interaction_history = [] # Limited list of {'partner_id', 'task_type', 'role', 'measured_qos', 'avg_qoe', 'timestamp'}
+        self.interaction_history: List[Dict[str, Any]] = [] 
         self.max_interaction_history_len = 20
-        self.trust_adjustment_factor = 5.0 # Max trust change per interaction based on QoE
+        self.trust_adjustment_factor = 5.0 
+        
+        if logger_instance:
+            self.logger = logger_instance
+        else: 
+            class PrintLogger: 
+                def log_info(self, tag, msg, context_override=None): print(f"INFO [{context_override or tag}] {msg}")
+                def log_warning(self, tag, msg, context_override=None): print(f"WARN [{context_override or tag}] {msg}")
+                def log_error(self, tag, msg, context_override=None): print(f"ERROR [{context_override or tag}] {msg}")
+                def _log_with_context(self, level, message, context_tag): 
+                    level_name = logging.getLevelName(level)
+                    print(f"[{level_name}] [{context_tag}] {message}")
+            self.logger = PrintLogger()
+        
+        self.current_job_id: Optional[str] = None 
+        self.current_minute_provider = current_minute_provider 
+        # Simulation metrics reference - to be set by simulation if device needs to update global sim metrics
+        self.sim_metrics_ref: Optional[Dict[str, Any]] = None
 
 
-    # --- Monetary Methods ---
-    def receive_income(self, amount, source_description=""):
-        self.balance += amount
-        self.total_income_earned += amount
-        self.current_period_income += amount
-        self.log_event(f"Received income: {amount} from {source_description}. New balance: {self.balance:.2f}")
+    def get_current_minute(self) -> int:
+        return self.current_minute_provider() if self.current_minute_provider else int(time.time() // 60) 
 
-    def pay_expense(self, amount, recipient_device, description=""):
+    def log_event(self, message: str, level: str = 'info', context_tag: Optional[str]=None):
+        effective_context = context_tag if context_tag else self.nameShort()
+        log_level_int = getattr(logging, level.upper(), logging.INFO)
+        
+        if hasattr(self.logger, '_log_with_context'): 
+             self.logger._log_with_context(log_level_int, message, effective_context)
+        elif hasattr(self.logger, level.lower()): 
+            # This assumes logger methods like log_info(tag, message)
+            # This might need adjustment based on the actual logger's method signature
+            try:
+                getattr(self.logger, level.lower())(effective_context, message)
+            except TypeError: # Fallback if the signature is just log_info(message)
+                getattr(self.logger, level.lower())(f"[{effective_context}] {message}")
+        else: 
+            print(f"[{level.upper()}] [{effective_context}] {message}")
+
+    def nameShort(self) -> str: 
+        class_name = self.__class__.__name__.replace("Device","D").replace("Sensor","Sens").replace("Actuator","Act").replace("Communicating","Comm").replace("Composite","Comp")
+        parts = self.device_id.split('_')
+        id_part = self.device_id
+        for part in reversed(parts): 
+            if any(char.isdigit() for char in part): id_part = part; break
+            elif len(parts) > 1 : id_part = parts[-1] 
+            else: id_part = self.device_id 
+        
+        id_part = id_part.replace('bldg','b').replace('lab','l').replace('zc','z').replace('dev','d')
+        id_part = id_part.replace('sensor','s').replace('actuator','a').replace('comm','c').replace('composite','co')
+        return f"{class_name}({id_part})"
+
+    def receive_income(self, amount: float, source_description: str = ""):
+        self.balance += amount; self.total_income_earned += amount; self.current_period_income += amount
+        self.log_event(f"Received income: {amount:.2f} from {source_description}. New balance: {self.balance:.2f}", level='debug')
+
+    def pay_expense(self, amount: float, recipient_device: Optional['Device'], description: str = "") -> bool:
         if self.balance >= amount:
-            self.balance -= amount
-            self.total_expenses_paid += amount
-            if recipient_device:
-                recipient_device.receive_income(amount, f"expense payment from {self.name} for {description}")
-            self.log_event(f"Paid expense: {amount:.2f} to {recipient_device.name if recipient_device else description}. New balance: {self.balance:.2f}")
+            self.balance -= amount; self.total_expenses_paid += amount
+            if recipient_device: recipient_device.receive_income(amount, f"payment from {self.nameShort()} for {description}")
+            self.log_event(f"Paid expense: {amount:.2f} to {recipient_device.nameShort() if recipient_device else description}. New balance: {self.balance:.2f}", level='debug')
             return True
         else:
-            self.log_event(f"Failed to pay expense: {amount:.2f} (insufficient balance: {self.balance:.2f})")
-            # This failure to pay could be a BAD QoS event if the payment was an obligation
-            # self.update_trust_from_qoe(recipient_device, "payment_obligation", {'task_success_binary': 0}, interaction_role="performer")
+            self.log_event(f"Failed to pay expense: {amount:.2f} (insufficient balance: {self.balance:.2f})", level='warning')
+            if self.framework_variant == "full_siot" and recipient_device:
+                 self.update_trust_from_qoe(recipient_device, "payment_obligation", 
+                                            {'task_success_binary': 0, 'response_time_ms': 1000}, 
+                                            interaction_role="performer_of_payment")
             return False
 
-    def apply_penalty_to_device(self, target_device, penalty_amount, reason=""):
-        self.log_event(f"Applying penalty: {penalty_amount:.2f} to {target_device.name} for {reason}.")
-        target_device.receive_penalty(penalty_amount, self.name, reason)
+    def apply_penalty_to_device(self, target_device: 'Device', penalty_amount: float, reason: str = ""):
+        self.log_event(f"Applying penalty: {penalty_amount:.2f} to {target_device.nameShort()} for {reason}.")
+        target_device.receive_penalty(penalty_amount, self.nameShort(), reason)
         self.total_penalties_applied_to_others += penalty_amount
 
-    def receive_penalty(self, penalty_amount, penalized_by="System/IoTApp", reason=""):
-        self.balance -= penalty_amount
-        self.total_penalties_received += penalty_amount
-        self.log_event(f"Received penalty: {penalty_amount:.2f} from {penalized_by} for {reason}. New balance: {self.balance:.2f}")
-        # Direct impact on trust for receiving a penalty
-        direct_trust_hit = -10.0 # More severe than a single bad QoE usually
-        self.trust_score = max(0.0, min(100.0, self.trust_score + direct_trust_hit))
-        self.log_event(f"Direct trust hit from penalty: {direct_trust_hit:.1f}. New trust: {self.trust_score:.1f}")
+    def receive_penalty(self, penalty_amount: float, penalized_by: str = "System", reason: str = ""):
+        self.balance -= penalty_amount; self.total_penalties_received += penalty_amount
+        self.log_event(f"Received penalty: {penalty_amount:.2f} from {penalized_by} for {reason}. New balance: {self.balance:.2f}", level='warning')
+        if self.framework_variant != "baseline":
+            direct_trust_hit = -10.0 
+            self.trust_score = max(0.0, min(100.0, self.trust_score + direct_trust_hit))
+            self.log_event(f"Direct trust hit from penalty: {direct_trust_hit:.1f}. New trust: {self.trust_score:.1f}")
 
     def check_min_income_satisfied(self):
         satisfied = self.current_period_income >= self.min_acceptable_income_threshold
-        if not satisfied:
-            self.log_event(f"Warning: Min income ({self.min_acceptable_income_threshold:.2f}) not met for period (earned: {self.current_period_income:.2f}).")
-        self.current_period_income = 0 # Reset for next period
+        if not satisfied and self.framework_variant != "baseline":
+            self.log_event(f"Warning: Min income ({self.min_acceptable_income_threshold:.2f}) not met for period (earned: {self.current_period_income:.2f}). Trust may be affected.", level='warning')
+        self.current_period_income = 0
         return satisfied
 
-    # --- Relationship Methods ---
-    def add_relationship(self, relation_type, device, constraints=None):
-        if relation_type in self.relationships:
-            if not any(r['device'] == device for r in self.relationships[relation_type]):
-                self.relationships[relation_type].append({
-                    'device': device, 'constraints': constraints or {},
-                    'start_time': time.time(), 'status': 'active'
-                })
-                self.log_event(f"Added '{relation_type}' relationship with {device.name}")
+    def add_relationship(self, relation_type: str, device: 'Device', constraints: Optional[Dict] = None):
+        if self.framework_variant == "baseline": return
+        if relation_type not in self.relationships: self.relationships[relation_type] = [] 
+        
+        if not any(r['device'] == device for r in self.relationships[relation_type]):
+            self.relationships[relation_type].append({
+                'device': device, 'constraints': constraints or {},
+                'start_time': time.time(), 'status': 'active', 
+                'interaction_count': 0, 'successful_interactions': 0, 'failed_interactions': 0,
+                'consecutive_failures': 0 
+            })
+            self.log_event(f"Added '{relation_type}' relationship with {device.nameShort()}", level='debug')
 
-    def avoid(self, device):
-        if 'avoid_me' not in self.relationships or not isinstance(self.relationships['avoid_me'], list):
-            self.relationships['avoid_me'] = []
+    def avoid(self, device: 'Device'):
+        if self.framework_variant == "baseline": return
+        if 'avoid_me' not in self.relationships: self.relationships['avoid_me'] = []
         if not any(r['device'] == device for r in self.relationships['avoid_me']):
             self.relationships['avoid_me'].append({'device': device, 'status': 'active', 'start_time': time.time()})
-            self.log_event(f"Avoiding device {device.name}")
+            self.log_event(f"Now AVOIDING device {device.nameShort()}")
+        
+    def get_relationship_with(self, partner_device: 'Device', relation_type: Optional[str] = None) -> Optional[Dict]:
+        if not partner_device or self.framework_variant == "baseline": return None
+        for rel_key_iter, rel_list in self.relationships.items():
+            if relation_type and rel_key_iter != relation_type: continue
+            for rel_entry in rel_list:
+                if rel_entry.get('device') == partner_device:
+                    return rel_entry
+        return None
 
-    # --- Load and Policy Methods ---
-    def negotiate_load(self, requested_load): # Check if CAN take load
-        return self.current_load + requested_load <= self.max_load
+    def negotiate_load(self, requested_load: int, from_device: Optional['Device'] = None, task_details: Optional[Dict]=None) -> bool: 
+        can_take_load_basic = (self.current_load + requested_load <= self.max_load)
+        if not can_take_load_basic: 
+            self.log_event(f"NEGOTIATION REJECT (Overload): Cannot take {requested_load} (current: {self.current_load}, max: {self.max_load})", level='debug')
+            return False
 
-    def consume_load(self, load_amount): # Actually add load
+        if self.framework_variant == "full_siot" and from_device:
+            requester_trust_proxy = getattr(from_device, 'trust_score', 50) 
+            
+            if requested_load > self.max_load * 0.5 and requester_trust_proxy < self.policy.get('min_trust_for_critical_delegation', 60):
+                self.log_event(f"NEGOTIATION REJECT: Task load {requested_load} too high from partner {from_device.nameShort()} with perceived trust {requester_trust_proxy:.1f}.", level='debug')
+                return False 
+            
+            if (self.current_load / self.max_load if self.max_load > 0 else 1.0) > self.policy.get('negotiation_reject_if_own_load_above_percent', 0.75):
+                self.log_event(f"NEGOTIATION REJECT: Own load too high ({self.current_load/self.max_load if self.max_load > 0 else 1.0:.2%}) for task from {from_device.nameShort()}.", level='debug')
+                return False
+            
+            required_capability = (task_details or {}).get('required_capability')
+            if required_capability and required_capability not in self.capabilities:
+                self.log_event(f"NEGOTIATION REJECT: Lacking capability '{required_capability}' for task from {from_device.nameShort()}.", level='debug')
+                return False
+
+            self.log_event(f"NEGOTIATION ACCEPT: Task from {from_device.nameShort()} accepted under full_siot policies.", level='debug')
+            return True
+
+        return True
+
+    def consume_load(self, load_amount: int) -> bool: 
         if self.current_load + load_amount <= self.max_load:
             self.current_load += load_amount
             return True
-        # If it would exceed, don't add, but log it as an issue if action was attempted
-        self.log_event(f"Attempted to consume load {load_amount} but would exceed max_load {self.max_load}. Current: {self.current_load}")
         return False
 
-    def reduce_load(self, amount=None):
-        if amount is None: amount = random.randint(max(1,int(self.current_load*0.1)), max(2,int(self.current_load*0.3))) # Reduce a percentage
+    def reduce_load(self, amount: Optional[int] = None):
+        if self.current_load == 0: return
+        if amount is None: 
+            amount = random.randint(max(1,int(self.current_load*0.1)), max(2,int(self.current_load*0.3))) 
         self.current_load = max(0, self.current_load - amount)
 
-    def check_policy(self, relation_type_context, task_type, from_device_partner, details=None):
-        # Example: Check if task is forbidden by a 'work_with_me' partner's constraints
-        # This needs to be specific to the active relationship with from_device_partner
-        for rel_list in self.relationships.values():
-            for rel in rel_list:
-                if rel['device'] == from_device_partner: # Found the specific relationship
-                    constraints = rel.get('constraints', {})
-                    if 'forbidden_tasks' in constraints and task_type in constraints['forbidden_tasks']:
-                        self.log_event(f"Policy violation with {from_device_partner.name}: Task '{task_type}' forbidden.")
-                        # This device violated policy towards partner, partner might penalize.
-                        # For self, this is a blame.
-                        self.blame_count +=1
-                        self.receive_penalty(self.policy_violation_penalty_value, "Policy Self-Violation", f"Task {task_type} to {from_device_partner.name}")
-                        return False # Policy violation
-        return True # No violation found or no specific constraint against it
+    def check_policy(self, relation_type_context: str, task_type: str, from_device_partner: Optional['Device'], details: Optional[Dict]=None) -> bool:
+        if self.framework_variant == "baseline": return True 
+        if not from_device_partner: return True 
 
-    def add_controller(self, controller_device, constraints=None):
-        if not any(d['device'] == controller_device for d in self.relationships['work_for_me']):
-            self.relationships['work_for_me'].append({
-                'device': controller_device, 'constraints': constraints or {}, 'start_time': time.time(),
-                'status': 'active', 'task_count': 0, 'total_load_assigned': 0})
-            self.log_event(f"Added {controller_device.name} as controller (I work for them)")
-            return True
-        return False
+        rel_entry = self.get_relationship_with(from_device_partner, relation_type_context)
+        if rel_entry:
+            constraints = rel_entry.get('constraints', {})
+            if task_type in constraints.get('forbidden_tasks', []):
+                self.log_event(f"POLICY VIOLATION with {from_device_partner.nameShort()}: Task '{task_type}' forbidden by relationship constraints.", level='warning')
+                self.blame_count +=1 
+                self.receive_penalty(self.policy_violation_penalty_value, "Policy Self-Violation", f"Forbidden Task '{task_type}' with {from_device_partner.nameShort()}")
+                return False 
+        return True 
 
-    def remove_controller(self, controller_device):
-        self.relationships['work_for_me'] = [r for r in self.relationships['work_for_me'] if r['device'] != controller_device]
-        self.log_event(f"Removed {controller_device.name} as controller")
+    def add_controller(self, controller_device: 'Device', constraints: Optional[Dict] = None) -> bool:
+        if self.framework_variant == "baseline": return False
+        if 'work_for_me' not in self.relationships: self.relationships['work_for_me'] = []
+        if any(r['device'] == controller_device for r in self.relationships['work_for_me']):
+            return False 
+        
+        self.relationships['work_for_me'].append({
+            'device': controller_device, 'constraints': constraints or {}, 'start_time': time.time(),
+            'status': 'active', 'task_count': 0, 'total_load_assigned': 0, 
+            'consecutive_task_failures_by_controller': 0}) 
+        self.log_event(f"Added {controller_device.nameShort()} as my controller (I work for them).")
+        return True
 
-    def is_authorized_controller(self, device):
-        return any(r['device'] == device and r['status'] == 'active' for r in self.relationships.get('work_for_me', []))
+    def remove_controller(self, controller_device: 'Device'):
+        if self.framework_variant == "baseline": return
+        if 'work_for_me' in self.relationships:
+            self.relationships['work_for_me'] = [r for r in self.relationships['work_for_me'] if r.get('device') != controller_device]
+            self.log_event(f"Removed {controller_device.nameShort()} as my controller.")
 
-    def check_controller_limits(self, controller_device, load_of_this_task):
-        for rel in self.relationships.get('work_for_me', []):
-            if rel['device'] == controller_device:
-                # Check ODRL-like constraints (count, load, time if defined in rel['constraints'])
-                if rel.get('task_count',0) >= rel.get('constraints',{}).get('max_tasks', self.policy['max_tasks_per_controller']):
-                    self.log_event(f"Controller {controller_device.name} exceeded max tasks policy.")
-                    self.misuse_count +=1
-                    return False
-                if rel.get('total_load_assigned',0) + load_of_this_task > rel.get('constraints',{}).get('max_load', self.policy['max_load_per_controller']):
-                    self.log_event(f"Controller {controller_device.name} exceeded max load policy.")
-                    self.misuse_count +=1
-                    return False
-                return True
-        return False # Not a recognized controller or no active relation
+    def is_authorized_controller(self, device: Optional['Device']) -> bool:
+        if self.framework_variant == "baseline" or not device: return False
+        return any(r.get('device') == device and r.get('status') == 'active' for r in self.relationships.get('work_for_me', []))
 
-    def update_controller_metrics(self, controller_device, load_of_this_task):
-        for rel in self.relationships.get('work_for_me', []):
-            if rel['device'] == controller_device:
-                rel['task_count'] = rel.get('task_count', 0) + 1
-                rel['total_load_assigned'] = rel.get('total_load_assigned', 0) + load_of_this_task; break
+    def check_controller_limits(self, controller_device: 'Device', load_of_this_task: int) -> bool:
+        if self.framework_variant == "baseline": return True 
+        
+        rel_entry = self.get_relationship_with(controller_device, 'work_for_me')
+        if not rel_entry: 
+            self.log_event(f"Warning: No 'work_for_me' relationship found with supposed controller {controller_device.nameShort()}", level='warning')
+            return False 
 
-    # --- QoS/QoE and Trust Update Methods ---
-    def _calculate_qoe_level_for_param(self, qos_param_name, announced_val, measured_val):
-        """Calculates QoE for a single QoS parameter based on |Announced - Measured|."""
-        if announced_val is None or measured_val is None: return QoELevel.FAIR # Cannot assess
+        rel_constraints = rel_entry.get('constraints',{})
+        max_tasks = rel_constraints.get('max_tasks', self.policy['max_tasks_per_controller'])
+        max_load_total = rel_constraints.get('max_load', self.policy['max_load_per_controller'])
+
+        current_task_count = rel_entry.get('task_count',0)
+        current_total_load = rel_entry.get('total_load_assigned',0)
+
+        if current_task_count >= max_tasks:
+            self.log_event(f"Controller {controller_device.nameShort()} exceeded max tasks policy ({current_task_count}/{max_tasks}).", level='warning')
+            return False 
+        if current_total_load + load_of_this_task > max_load_total:
+            self.log_event(f"Controller {controller_device.nameShort()} would exceed max load policy with this task ({current_total_load + load_of_this_task}/{max_load_total}).", level='warning')
+            return False 
+        return True
+
+    def update_controller_metrics(self, controller_device: 'Device', load_of_this_task: int, task_succeeded: bool):
+        if self.framework_variant == "baseline": return
+        rel_entry = self.get_relationship_with(controller_device, 'work_for_me')
+        if rel_entry:
+            rel_entry['task_count'] = rel_entry.get('task_count', 0) + 1
+            rel_entry['total_load_assigned'] = rel_entry.get('total_load_assigned', 0) + load_of_this_task
+            if not task_succeeded:
+                rel_entry['consecutive_task_failures_by_controller'] = rel_entry.get('consecutive_task_failures_by_controller',0) + 1
+            else:
+                rel_entry['consecutive_task_failures_by_controller'] = 0 
+    
+    def _calculate_qoe_level_for_param(self, qos_param_name: str, announced_val: Optional[float], measured_val: Optional[float]) -> QoELevel:
+        if announced_val is None or measured_val is None: return QoELevel.FAIR 
         if qos_param_name not in self.qoe_thresholds:
-            self.log_event(f"Warning: QoE thresholds undefined for '{qos_param_name}'. Assuming FAIR.")
+            self.log_event(f"Warning: QoE thresholds undefined for '{qos_param_name}'. Assuming FAIR.", level='debug')
             return QoELevel.FAIR
-
-        # For rates (0-1), a direct difference is fine.
-        # For response time, it's also a direct difference.
-        # For success (binary 0 or 1), announced is typically 1 (or high rate like 0.95).
-        # If announced is a rate (e.g. 0.95) and measured is binary (0 or 1),
-        # then diff for success is |0.95 - 1| = 0.05 (good), for failure is |0.95 - 0| = 0.95 (bad).
         
         sigma = self.qoe_thresholds[qos_param_name]['sigma']
         delta = self.qoe_thresholds[qos_param_name]['delta']
         diff = abs(announced_val - measured_val)
 
-        # Invert logic for parameters where lower measured is better (e.g. response time, bad load_efficiency > 1)
-        # This is simplified; a proper model would define if higher/lower is better per QoS param.
-        # For now, we assume announced_val is the ideal target.
-        if qos_param_name == 'response_time_ms': # Lower measured is better, but formula is |A-M|
-             pass # The |A-M| formula inherently handles this if A is the target.
-        elif qos_param_name == 'load_efficiency': # M > A is bad if A is 1.0 (ideal)
-             pass # |A-M| handles it.
-
         if diff < (sigma - delta): return QoELevel.GOOD
         elif diff < (sigma + delta): return QoELevel.FAIR
         else: return QoELevel.BAD
 
-    def update_trust_from_qoe(self, partner_device, task_type, measured_qos_params, interaction_role):
-        """
-        Updates this device's trust score (general or in partner_device) based on QoE.
-        interaction_role: 'performer' (this device did the task for partner),
-                          'requester' (this device asked partner to do the task).
-        measured_qos_params: Dict from the performer, e.g., {'task_success_binary': 1, 'response_time_ms': 55.0, 'load_consumed': 10}
-        """
-        # This method updates THIS device's trust.
-        # If role is 'performer', it updates its own general trust based on its performance.
-        # If role is 'requester', it updates its trust IN THE PARTNER based on partner's performance.
-        # For now, we only update the general self.trust_score. Per-partner trust is a TODO.
+    def update_trust_from_qoe(self, partner_device: Optional['Device'], task_type: str, 
+                              measured_qos_params: Dict[str, Any], interaction_role: str):
+        if self.framework_variant == "baseline": return 
 
-        qoe_values_for_agg = []
-        log_qoe_details = []
+        qoe_values_for_agg: List[int] = []
+        log_qoe_details: List[str] = []
+        announced_qos_set = {}
 
-        # Determine the set of announced/expected QoS parameters to use
-        if interaction_role == "performer": # This device performed, compare to its own announced_qos
-            announced_qos_set = self.announced_qos
-        elif interaction_role == "requester": # This device requested, compare to its expected_partner_qos
-            announced_qos_set = self.expected_partner_qos
-        else: # E.g. self-assessment not tied to a partner
-            announced_qos_set = self.announced_qos
+        if interaction_role == "performer": announced_qos_set = self.announced_qos
+        elif interaction_role == "requester": announced_qos_set = self.expected_partner_qos
+        elif interaction_role == "performer_of_payment": announced_qos_set = {'task_success_rate': 1.0}
+        elif interaction_role == "requester_of_good_policy": announced_qos_set = {'policy_adherence_binary': 1.0}
+        else: announced_qos_set = self.announced_qos 
 
-
-        # 1. Task Success (Binary)
+        # --- Calculate QoE for each relevant parameter ---
         if 'task_success_binary' in measured_qos_params:
-            announced_sr = announced_qos_set.get('task_success_rate', 1.0) # Default to expecting 100% success
-            qoe_sr = self._calculate_qoe_level_for_param('task_success_rate', announced_sr, measured_qos_params['task_success_binary'])
-            qoe_values_for_agg.append(qoe_sr.value)
-            log_qoe_details.append(f"SR QoE:{qoe_sr.name}(E:{announced_sr*100:.0f}%,A:{measured_qos_params['task_success_binary']*100:.0f}%)")
-
-        # 2. Response Time (if available)
+            announced_val = announced_qos_set.get('task_success_rate', 1.0) 
+            qoe = self._calculate_qoe_level_for_param('task_success_rate', announced_val, measured_qos_params['task_success_binary'])
+            qoe_values_for_agg.append(qoe.value)
+            log_qoe_details.append(f"SR:{qoe.name[0]}(E:{announced_val*100:.0f}A:{measured_qos_params['task_success_binary']*100:.0f})")
         if 'response_time_ms' in measured_qos_params:
-            announced_rt = announced_qos_set.get('response_time_ms')
-            if announced_rt is not None:
-                qoe_rt = self._calculate_qoe_level_for_param('response_time_ms', announced_rt, measured_qos_params['response_time_ms'])
-                qoe_values_for_agg.append(qoe_rt.value)
-                log_qoe_details.append(f"RT QoE:{qoe_rt.name}(E:{announced_rt:.0f},A:{measured_qos_params['response_time_ms']:.0f}ms)")
-
-        # 3. Load Efficiency (relevant if this device was the performer)
+            announced_val = announced_qos_set.get('response_time_ms')
+            if announced_val is not None:
+                qoe = self._calculate_qoe_level_for_param('response_time_ms', announced_val, measured_qos_params['response_time_ms'])
+                qoe_values_for_agg.append(qoe.value)
+                log_qoe_details.append(f"RT:{qoe.name[0]}(E:{announced_val:.0f}A:{measured_qos_params['response_time_ms']:.0f})")
         if interaction_role == "performer" and 'load_consumed' in measured_qos_params and 'expected_load_for_task' in measured_qos_params:
-            announced_le = announced_qos_set.get('load_efficiency', 1.0) # Ideal efficiency
-            expected_task_load = measured_qos_params['expected_load_for_task']
-            actual_task_load = measured_qos_params['load_consumed']
-            
-            measured_efficiency = actual_task_load / expected_task_load if expected_task_load > 0 else 1.0
-            
-            qoe_le = self._calculate_qoe_level_for_param('load_efficiency', announced_le, measured_efficiency)
-            qoe_values_for_agg.append(qoe_le.value)
-            log_qoe_details.append(f"LE QoE:{qoe_le.name}(E_eff:{announced_le:.2f},A_eff:{measured_efficiency:.2f} from E_load:{expected_task_load},A_load:{actual_task_load})")
+            announced_val = announced_qos_set.get('load_efficiency', 1.0) 
+            expected_load = measured_qos_params.get('expected_load_for_task', 1.0) 
+            actual_load = measured_qos_params['load_consumed']
+            measured_eff = actual_load / expected_load if expected_load > 0 else 1.0
+            qoe = self._calculate_qoe_level_for_param('load_efficiency', announced_val, measured_eff)
+            qoe_values_for_agg.append(qoe.value)
+            log_qoe_details.append(f"LE:{qoe.name[0]}(E:{announced_val:.1f}A:{measured_eff:.1f})")
+        if 'policy_adherence_binary' in measured_qos_params: 
+            announced_val = announced_qos_set.get('policy_adherence_binary', 1.0)
+            qoe = self._calculate_qoe_level_for_param('policy_adherence_binary', announced_val, measured_qos_params['policy_adherence_binary'])
+            qoe_values_for_agg.append(qoe.value)
+            log_qoe_details.append(f"PA:{qoe.name[0]}")
+        if self.framework_variant == "full_siot" and 'negotiation_success_binary' in measured_qos_params:
+            announced_val = announced_qos_set.get('negotiation_success_binary', 1.0) 
+            qoe = self._calculate_qoe_level_for_param('negotiation_success_binary', announced_val, measured_qos_params['negotiation_success_binary'])
+            qoe_values_for_agg.append(qoe.value)
+            log_qoe_details.append(f"Neg:{qoe.name[0]}")
+        if 'availability_binary' in measured_qos_params: 
+            announced_val = 1.0 
+            qoe = self._calculate_qoe_level_for_param('availability_binary', announced_val, measured_qos_params['availability_binary'])
+            qoe_values_for_agg.append(qoe.value)
+            log_qoe_details.append(f"Avail:{qoe.name[0]}")
 
 
-        if not qoe_values_for_agg:
-            # self.log_event(f"No QoS params to calculate QoE for interaction with {partner_device.name if partner_device else 'N/A'} for {task_type}.")
-            return
+        if not qoe_values_for_agg: return
 
-        avg_qoe_numeric = sum(qoe_values_for_agg) / len(qoe_values_for_agg) # Average of (0, 1, 2)
-
-        # Translate average QoE (0-2) to a trust score adjustment
+        avg_qoe_numeric = sum(qoe_values_for_agg) / len(qoe_values_for_agg)
         delta_trust = (avg_qoe_numeric - QoELevel.FAIR.value) * self.trust_adjustment_factor
+        delta_trust_multiplier = 1.0 
 
-        # If this device is a requester, it's updating trust IN THE PARTNER.
-        # For now, all updates go to self.trust_score (general trust). This needs refinement for per-partner trust.
-        # If we had self.trust_in_partners = {}, we'd update self.trust_in_partners[partner_device.device_id]
-        target_entity_name = partner_device.name if interaction_role == "requester" and partner_device else self.name +" (self)"
+        if self.framework_variant == "full_siot" and partner_device:
+            rel_entry = self.get_relationship_with(partner_device) 
+            if rel_entry:
+                rel_entry['interaction_count'] = rel_entry.get('interaction_count',0) + 1
+                if avg_qoe_numeric >= QoELevel.FAIR.value : 
+                    rel_entry['successful_interactions'] = rel_entry.get('successful_interactions',0) + 1
+                    rel_entry['consecutive_failures'] = 0 
+                else: 
+                    rel_entry['failed_interactions'] = rel_entry.get('failed_interactions',0) + 1
+                    rel_entry['consecutive_failures'] = rel_entry.get('consecutive_failures',0) + 1
+                
+                if rel_entry['consecutive_failures'] >= self.policy.get('max_failed_interactions_before_avoid',3):
+                    self.log_event(f"MISUSE ALERT: Partner {partner_device.nameShort()} has {rel_entry['consecutive_failures']} consecutive failures. Harsher trust penalty. Consider avoiding.", level='warning')
+                    delta_trust_multiplier = 2.0 
+                    self.misuse_incidents_flagged += 1 
+                    if self.sim_metrics_ref and 'misuse_incidents_detected' in self.sim_metrics_ref:
+                        self.sim_metrics_ref['misuse_incidents_detected'] += 1
 
-        self.trust_score = max(0.0, min(100.0, self.trust_score + delta_trust)) # Update general trust for now
+
+        if delta_trust < 0: delta_trust *= delta_trust_multiplier 
         
-        self.log_event(f"QoE-Trust ({interaction_role} for task '{task_type}' with {partner_device.name if partner_device else 'Self/System'}): "
-                       f"{', '.join(log_qoe_details)}. AvgQoE:{avg_qoe_numeric:.2f}. dT:{delta_trust:.1f}. "
-                       f"New Gen.Trust for {self.name}:{self.trust_score:.1f}")
+        self.trust_score = max(0.0, min(100.0, self.trust_score + delta_trust))
+        
+        partner_name_log = partner_device.nameShort() if partner_device else "Self/System"
+        self.log_event(f"QoE ({interaction_role} for '{task_type}' with {partner_name_log}): "
+                       f"{', '.join(log_qoe_details) if log_qoe_details else 'NoQoSDetails'}. AvgQoE:{avg_qoe_numeric:.2f}. dT:{delta_trust:.1f}. "
+                       f"New Trust for {self.nameShort()}:{self.trust_score:.1f}", level='debug')
 
-        # Store interaction for history (could be used for per-partner trust later)
         interaction_record = {
             'partner_id': partner_device.device_id if partner_device else None,
+            'partner_name': partner_device.nameShort() if partner_device else None,
             'task_type': task_type, 'role': interaction_role, 'measured_qos': measured_qos_params,
-            'avg_qoe': avg_qoe_numeric, 'timestamp': time.time() }
+            'avg_qoe_calculated_value': avg_qoe_numeric, 
+            'delta_trust_calculated': delta_trust, 
+            'timestamp': self.get_current_minute() } 
         self.interaction_history.append(interaction_record)
         if len(self.interaction_history) > self.max_interaction_history_len: self.interaction_history.pop(0)
 
 
-    def handle_request(self, from_device, task_type, load_requested=10, details=None):
-        """
-        Base handler for requests. Subclasses will call this then add their specific logic.
-        Returns a dict: {'success': bool, 'reason': str, 'measured_qos_for_requestor': dict, 'request_start_time': float}
-        'measured_qos_for_requestor' contains QoS aspects of THIS device's attempt to handle, from requestor's POV.
-        """
-        details = details or {}
+    def handle_request(self, from_device: Optional['Device'], task_type: str, 
+                       load_requested: int = 10, details: Optional[Dict] = None) -> Dict[str, Any]:
+        details = details if details is not None else {}
         request_start_time = time.time()
-        measured_qos_outcome = {'response_time_ms': 0.0, 'task_success_binary': 0} # Initialize
+        measured_qos_for_requestor = {'task_success_binary': 0, 'response_time_ms': 0.0, 'expected_load_for_task': load_requested} 
 
-        if any(r['device'] == from_device for r in self.relationships.get('avoid_me', [])):
-            self.log_event(f"Rejected (AVOIDED) request for '{task_type}' from {from_device.name if from_device else 'N/A'}")
-            measured_qos_outcome['response_time_ms'] = (time.time() - request_start_time) * 1000
-            # This device (self) successfully enforced its 'avoid' policy. Not necessarily a trust hit for self.
-            # from_device would have a bad QoE with this device.
-            return {'success': False, 'reason': 'avoided_device', 'measured_qos_for_requestor': measured_qos_outcome, 'request_start_time': request_start_time}
+        # 1. Avoidance Check
+        if self.framework_variant != "baseline" and from_device and \
+           any(r.get('device') == from_device for r in self.relationships.get('avoid_me', [])):
+            self.log_event(f"Rejected (AVOIDED) request for '{task_type}' from {from_device.nameShort()}")
+            measured_qos_for_requestor['response_time_ms'] = (time.time() - request_start_time) * 1000
+            return {'success': False, 'reason': 'avoided_device', 'measured_qos_for_requestor': measured_qos_for_requestor, 'request_start_time': request_start_time}
 
-        is_controller_req = self.is_authorized_controller(from_device)
-        if is_controller_req and not self.check_controller_limits(from_device, load_requested):
-            self.log_event(f"Rejected (CONTROLLER_LIMITS) request for '{task_type}' from {from_device.name}")
-            measured_qos_outcome['response_time_ms'] = (time.time() - request_start_time) * 1000
-            # This device correctly rejected a misbehaving controller. This is GOOD for self.
-            # self.update_trust_from_qoe(from_device, "controller_policy_enforcement", {'task_success_binary': 1}, interaction_role="performer")
-            # from_device (controller) had a bad interaction with self (its request was denied for good reason)
-            return {'success': False, 'reason': 'controller_limits_exceeded', 'measured_qos_for_requestor': measured_qos_outcome, 'request_start_time': request_start_time}
-
-        # Check general policies for this interaction (e.g. if from_device is a work-with-me partner)
-        if from_device and not self.check_policy('work_with_me', task_type, from_device, details):
-            # Self violated a policy it had with from_device
-            measured_qos_outcome['response_time_ms'] = (time.time() - request_start_time) * 1000
-            # Update self trust based on this self-acknowledged policy violation (bad performance)
-            self.update_trust_from_qoe(from_device, task_type, {'task_success_binary': 0, 'policy_adherence_binary':0}, interaction_role="performer")
-            return {'success': False, 'reason': 'policy_violation_generic', 'measured_qos_for_requestor': measured_qos_outcome, 'request_start_time': request_start_time}
-
-
-        if not self.negotiate_load(load_requested): # Check if device CAN take load
-            self.misuse_count += 1 # Counts as a form of unavailability
-            self.log_event(f"Rejected (OVERLOAD) request for '{task_type}' from {from_device.name if from_device else 'N/A'}")
-            measured_qos_outcome['response_time_ms'] = (time.time() - request_start_time) * 1000
-            # This device was unavailable. Bad QoS for from_device.
-            # Self-assessment: performer (self) failed due to overload.
-            self.update_trust_from_qoe(from_device, task_type, {'task_success_binary': 0, 'availability_binary':0}, interaction_role="performer")
-            return {'success': False, 'reason': 'overload', 'measured_qos_for_requestor': measured_qos_outcome, 'request_start_time': request_start_time}
-
-        # If all checks pass, provisionally accept. Subclass will do the work.
-        self.log_event(f"Provisionally accepted task '{task_type}' from {from_device.name if from_device else 'N/A'} (load_requested: {load_requested})")
-        if is_controller_req: self.update_controller_metrics(from_device, load_requested)
+        # 2. Controller Limit Checks
+        if self.framework_variant != "baseline" and from_device and self.is_authorized_controller(from_device):
+            if not self.check_controller_limits(from_device, load_requested): 
+                measured_qos_for_requestor['response_time_ms'] = (time.time() - request_start_time) * 1000
+                measured_qos_for_requestor['policy_adherence_binary'] = 0 
+                self.update_trust_from_qoe(from_device, "controller_limit_check_by_worker", 
+                                           {'task_success_binary': 0, 'policy_adherence_binary': 0}, 
+                                           interaction_role="requester_of_good_policy") 
+                return {'success': False, 'reason': 'controller_limits_exceeded', 'measured_qos_for_requestor': measured_qos_for_requestor, 'request_start_time': request_start_time}
         
-        # Subclass needs to consume load using self.consume_load(actual_load_for_task)
-        return {'success': True, 'reason': 'accepted_by_base_policy_and_load', 'request_start_time': request_start_time}
+        # 3. General Policy Check (if self is about to violate a policy with from_device)
+        if self.framework_variant != "baseline" and from_device:
+            relation_type_context = 'work_for_me' if self.is_authorized_controller(from_device) else 'work_with_me'
+            if not self.check_policy(relation_type_context, task_type, from_device, details):
+                measured_qos_for_requestor['response_time_ms'] = (time.time() - request_start_time) * 1000
+                measured_qos_for_requestor['policy_adherence_binary'] = 0 
+                self.update_trust_from_qoe(from_device, task_type, 
+                                           {'task_success_binary': 0, 'policy_adherence_binary':0}, 
+                                           interaction_role="performer")
+                return {'success': False, 'reason': 'policy_violation_by_self_to_partner', 'measured_qos_for_requestor': measured_qos_for_requestor, 'request_start_time': request_start_time}
 
-
-    def log_event(self, message):
-        self.logger.log_info(f"{self.name}({self.device_id})", message)
+        # 4. Negotiation & Load Check
+        can_take_task = self.negotiate_load(load_requested, from_device, details)
+        negotiation_qos_param = {} 
+        if self.framework_variant == "full_siot" and from_device : 
+            negotiation_qos_param = {'negotiation_success_binary': 1 if can_take_task else 0}
+            
+        if not can_take_task:
+            reason = 'negotiation_failed' if self.framework_variant == "full_siot" and from_device else 'overload'
+            self.log_event(f"Rejected ({reason.upper()}) for '{task_type}' from {from_device.nameShort() if from_device else 'N/A'}")
+            measured_qos_for_requestor['response_time_ms'] = (time.time() - request_start_time) * 1000
+            measured_qos_for_requestor.update(negotiation_qos_param) 
+            self.update_trust_from_qoe(from_device, task_type, 
+                                       {**measured_qos_for_requestor, 'task_success_binary': 0, 'availability_binary': 0}, 
+                                       interaction_role="performer")
+            return {'success': False, 'reason': reason, 'measured_qos_for_requestor': measured_qos_for_requestor, 'request_start_time': request_start_time}
+        
+        self.log_event(f"Provisionally accepted task '{task_type}' from {from_device.nameShort() if from_device else 'N/A'} (load_req: {load_requested})", level='debug')
+        
+        return {'success': True, 'reason': 'accepted_by_base_checks', 
+                'request_start_time': request_start_time, 
+                'negotiation_qos': negotiation_qos_param} 
 
     def report_status(self):
-        trust_str = f"Trust:{self.trust_score:.1f}"
+        trust_str = f"Trust:{self.trust_score:.1f}" if self.framework_variant != "baseline" else "Trust:N/A"
         load_str = f"Load:{self.current_load}/{self.max_load}"
         bal_str = f"Bal:{self.balance:.0f}"
-        inc_str = f"Inc:{self.total_income_earned:.0f}"
-        exp_str = f"Exp:{self.total_expenses_paid:.0f}"
+        inc_str = f"IncEarn:{self.total_income_earned:.0f}"
+        exp_str = f"ExpPaid:{self.total_expenses_paid:.0f}"
         pen_str = f"PenRcv:{self.total_penalties_received:.0f}"
-        misu_str = f"Misu:{self.misuse_count}"
+        mis_str = f"MisFlg:{self.misuse_incidents_flagged}" if self.framework_variant == "full_siot" else ""
         blame_str = f"Blame:{self.blame_count}"
-        rels = [f"{k.split('_')[0][:2]}:{len(v)}" for k,v in self.relationships.items() if v]
-        rel_str = f"Rel:[{','.join(rels)}]" if rels else "Rel:[0]"
         
-        self.logger.log_info(f"{self.nameShort()}", f"{trust_str} {bal_str} {load_str} {inc_str} {exp_str} {pen_str} {misu_str} {blame_str} {rel_str}")
+        rels_summary = []
+        if self.framework_variant != "baseline":
+            for k,v_list in self.relationships.items():
+                if v_list:
+                    active_count = sum(1 for r_entry in v_list if r_entry.get('status') == 'active')
+                    if active_count > 0:
+                        rels_summary.append(f"{k.split('_')[0][:2]}:{active_count}")
+        rel_str = f"Rel:[{','.join(rels_summary)}]" if rels_summary else "" 
+        
+        self.logger.log_info(self.nameShort(), f"STATUS: {trust_str} {bal_str} {load_str} {inc_str} {exp_str} {pen_str} {mis_str} {blame_str} {rel_str}")
 
-    def nameShort(self): # Helper for shorter logs
-        return f"{self.name.replace('Device','').replace('Lab','L').replace('Sensor','S').replace('Actuator','A').replace('Comm','C').replace('Composite','Co')}({self.device_id.replace('lab_','').replace('sens','s').replace('act','a').replace('comm','c').replace('comp','co')})"
+    def select_worker_for_task(self, worker_list: List['Device'], task_description: str) -> Optional['Device']:
+        if not worker_list: return None
+
+        if self.framework_variant == "baseline":
+            return random.choice(worker_list) if worker_list else None
+        else: 
+            available_workers = [w for w in worker_list if w.current_load < w.max_load * 0.85] 
+            if not available_workers:
+                self.log_event(f"No available (non-overloaded) workers for task '{task_description}' among {len(worker_list)} candidates.", level='debug')
+                return None
+            
+            sorted_workers = sorted(available_workers, key=lambda w: (getattr(w, 'trust_score', 0), -w.current_load), reverse=True)
+            
+            selected_worker = sorted_workers[0] 
+            self.log_event(f"Selected worker {selected_worker.nameShort()} (Trust: {selected_worker.trust_score:.1f}, Load: {selected_worker.current_load}) for '{task_description}'.", level='debug')
+            return selected_worker
