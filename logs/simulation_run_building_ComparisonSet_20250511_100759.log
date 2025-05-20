@@ -1,3 +1,0 @@
-2025-05-11 10:07:59 [INFO ] [building_ComparisonSet] Logger initialized for overall simulation: building_ComparisonSet
-2025-05-11 10:07:59 [INFO ] [building_baseline] Target devices: 30. Building sim (Baseline_No_SIoT) with: 2 zones, 14 avg devices/zone. Approx created: 31
-2025-05-11 10:07:59 [INFO ] [building_baseline] Building Simulation (baseline) | Devices: approx 31 | Zones: 2 | Duration: 240m

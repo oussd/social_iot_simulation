@@ -701,7 +701,7 @@ class BuildingSimulation:
             avg_trust_val_report = sum(d.trust_score for d in self.devices) / len(self.devices)
             self.metrics['avg_trust_at_end'] = avg_trust_val_report 
         else:
-             self.metrics['avg_trust_at_end'] = "N/A (Baseline or No Devices)"
+             self.metrics['avg_trust_at_end'] = "N/A"
 
         avg_trust_display = f"{self.metrics['avg_trust_at_end']:.2f}" if isinstance(self.metrics['avg_trust_at_end'], float) else self.metrics['avg_trust_at_end']
 
