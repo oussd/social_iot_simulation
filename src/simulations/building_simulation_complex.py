@@ -4,7 +4,6 @@ import uuid # For unique job IDs
 from collections import deque # For job queue
 from typing import List, Dict, Any, Optional
 
-# Assuming these are in the same directory structure
 from ..devices.device import Device, QoELevel
 from ..devices.sensing_device import SensingDevice
 from ..devices.actuating_device import ActuatingDevice
@@ -12,31 +11,87 @@ from ..devices.communicating_device import CommunicatingDevice
 from ..devices.composite_device import CompositeDevice
 from ..utils.logger import SimulationLogger
 
-# --- Specialized Device Types (Copied from building_simulation_enhanced_v1) ---
+# --- Specialized Device Types (defined within this simulation file) ---
 class CardReaderSensor(SensingDevice):
-    def __init__(self, device_id, name, max_load=50, framework_variant="full_siot", logger_instance=None, current_minute_provider=None):
-        super().__init__(device_id, name, max_load, sensor_type="card_swipe", framework_variant=framework_variant, logger_instance=logger_instance, current_minute_provider=current_minute_provider)
+    def __init__(self, device_id, name, max_load=50, framework_variant="full_siot", logger_instance=None, current_minute_provider=None, **kwargs):
+        super().__init__(device_id, name, max_load, sensor_type="card_swipe", framework_variant=framework_variant, logger_instance=logger_instance, current_minute_provider=current_minute_provider, **kwargs)
         self.access_log = []
 
     def _perform_sense_action(self, expected_load_for_task: int) -> Dict[str, Any]:
-        return super()._perform_sense_action(expected_load_for_task)
+        action_start_time = time.time()
+        if random.random() < self.fault_probability:
+            self.log_warning(f"Simulating internal fault during CardReaderSensor sense action.")
+            processing_time_ms = (time.time() - action_start_time) * 1000
+            if self.sim_metrics_ref: self.sim_metrics_ref['faulty_device_actions_failed'] = self.sim_metrics_ref.get('faulty_device_actions_failed',0) + 1
+            return {'success': False, 'reason': 'internal_device_fault', 'load_consumed': 0,
+                    'processing_time_ms': processing_time_ms, 'data_accuracy_measured': 0.0, 'value': None}
+        action_load_cost = int(expected_load_for_task * random.uniform(0.8, 1.2))
+        action_load_cost = max(1, action_load_cost)
+        if not self.consume_load(action_load_cost):
+            return {'success': False, 'reason': 'overload_at_action', 'load_consumed': 0, 
+                    'processing_time_ms': (time.time() - action_start_time) * 1000,
+                    'data_accuracy_measured': 0.0, 'value': None}
+        effective_response_time_ms = self.announced_qos.get('response_time_ms', 50) 
+        if self.behavior_profile == 'deceptive':
+            effective_response_time_ms /= getattr(self, 'deception_factor', 1.0)
+        simulated_action_processing_ms = effective_response_time_ms * random.uniform(0.7, 1.3)
+        time.sleep(simulated_action_processing_ms / 1000.0)
+        card_data = f"card_data_{random.randint(1000,9999)}_user{random.randint(1,10)}"
+        current_sim_minute = self.get_current_minute()
+        self.access_log.append({'time': current_sim_minute, 'card': card_data})
+        processing_time_ms = (time.time() - action_start_time) * 1000
+        actual_accuracy = self.announced_qos.get('data_accuracy',0.95) * random.uniform(0.85, 1.03)
+        if self.behavior_profile == 'deceptive':
+            actual_accuracy *= getattr(self, 'deception_factor', 1.0)
+        actual_accuracy = min(1.0, max(0.0, actual_accuracy))
+        self.log_debug(f"Card swipe detected: {card_data} in {processing_time_ms:.0f}ms, Load: {action_load_cost} (Acc: {actual_accuracy:.2f})")
+        return {
+            'success': True, 'value': card_data, 'load_consumed': action_load_cost,
+            'processing_time_ms': processing_time_ms, 'data_accuracy_measured': actual_accuracy
+        }
 
 class PowerMeterSensor(SensingDevice):
-    def __init__(self, device_id, name, max_load=50, zone_name="", framework_variant="full_siot", logger_instance=None, current_minute_provider=None):
-        super().__init__(device_id, name, max_load, sensor_type="power_usage", framework_variant=framework_variant, logger_instance=logger_instance, current_minute_provider=current_minute_provider)
+    def __init__(self, device_id, name, max_load=50, zone_name="", framework_variant="full_siot", logger_instance=None, current_minute_provider=None, **kwargs):
+        super().__init__(device_id, name, max_load, sensor_type="power_usage", framework_variant=framework_variant, logger_instance=logger_instance, current_minute_provider=current_minute_provider, **kwargs)
         self.current_power_draw_kw = random.uniform(0.5, 5.0)
         self.zone_name = zone_name
 
     def _perform_sense_action(self, expected_load_for_task: int) -> Dict[str, Any]:
-        return super()._perform_sense_action(expected_load_for_task)
+        action_start_time = time.time()
+        if random.random() < self.fault_probability:
+            self.log_warning(f"Simulating internal fault during PowerMeterSensor sense action.")
+            processing_time_ms = (time.time() - action_start_time) * 1000
+            if self.sim_metrics_ref: self.sim_metrics_ref['faulty_device_actions_failed'] = self.sim_metrics_ref.get('faulty_device_actions_failed',0) + 1
+            return {'success': False, 'reason': 'internal_device_fault', 'load_consumed': 0,
+                    'processing_time_ms': processing_time_ms, 'data_accuracy_measured': 0.0, 'value': None}
+        action_load_cost = int(expected_load_for_task * random.uniform(0.8, 1.2))
+        action_load_cost = max(1, action_load_cost)
+        if not self.consume_load(action_load_cost):
+            return {'success': False, 'reason': 'overload_at_action', 'load_consumed': 0, 
+                    'processing_time_ms': (time.time() - action_start_time) * 1000,
+                    'data_accuracy_measured': 0.0, 'value': None}
+        effective_response_time_ms = self.announced_qos.get('response_time_ms', 50)
+        if self.behavior_profile == 'deceptive':
+            effective_response_time_ms /= getattr(self, 'deception_factor', 1.0)
+        simulated_action_processing_ms = effective_response_time_ms * random.uniform(0.7, 1.3)
+        time.sleep(simulated_action_processing_ms / 1000.0)
+        self.current_power_draw_kw += random.uniform(-0.2, 0.2)
+        self.current_power_draw_kw = max(0.1, self.current_power_draw_kw)
+        processing_time_ms = (time.time() - action_start_time) * 1000
+        actual_accuracy = self.announced_qos.get('data_accuracy',0.95) * random.uniform(0.98, 1.0)
+        if self.behavior_profile == 'deceptive':
+            actual_accuracy *= getattr(self, 'deception_factor', 1.0)
+        actual_accuracy = min(1.0, max(0.0, actual_accuracy))
+        self.log_debug(f"Power usage for {self.zone_name}: {self.current_power_draw_kw:.2f} kW (Acc: {actual_accuracy:.2f})")
+        return {
+            'success': True, 'value': self.current_power_draw_kw, 'load_consumed': action_load_cost,
+            'processing_time_ms': processing_time_ms, 'data_accuracy_measured': actual_accuracy
+        }
 
 class SmartPlugActuator(ActuatingDevice):
-    def __init__(self, device_id, name, max_load=30, framework_variant="full_siot", logger_instance=None, current_minute_provider=None):
-        super().__init__(device_id, name, max_load, actuator_type="smart_plug", framework_variant=framework_variant, logger_instance=logger_instance, current_minute_provider=current_minute_provider)
+    def __init__(self, device_id, name, max_load=30, framework_variant="full_siot", logger_instance=None, current_minute_provider=None, **kwargs):
+        super().__init__(device_id, name, max_load, actuator_type="smart_plug", framework_variant=framework_variant, logger_instance=logger_instance, current_minute_provider=current_minute_provider, **kwargs)
         self.current_state = "ON"
-
-    def _perform_actuation_action(self, command: Any, expected_load_for_task: int) -> Dict[str, Any]:
-        return super()._perform_actuation_action(command, expected_load_for_task)
 
 class BuildingJob:
     def __init__(self, job_id: str, creation_time: int, job_type: str,
@@ -75,12 +130,10 @@ class BuildingSimulationComplex:
         self.num_zones = num_zones
         self.devices_per_zone_avg = devices_per_zone_avg
         self.num_devices_approx = (num_zones * devices_per_zone_avg) + num_zones + 1
-
         self.devices: List[Device] = []
         self.zone_controllers: Dict[str, CompositeDevice] = {}
         self.bms: Optional[CompositeDevice] = None
         self.zones: List[str] = [f"Zone{i+1}" for i in range(num_zones)]
-
         self.time_frame = duration_minutes
         self.run_context_name = run_context_name
 
@@ -90,22 +143,20 @@ class BuildingSimulationComplex:
             self.logger = SimulationLogger(simulation_name=run_context_name)
 
         self.current_minute = 0
-
         self.job_queue: deque[BuildingJob] = deque()
         self.active_jobs: Dict[str, BuildingJob] = {}
         self.processed_jobs: List[BuildingJob] = []
         self.next_job_id_counter = 0
-
-        self.scheduled_job_interval = 20
-        self.event_trigger_chance = 0.25
-        self.sudden_workload_chance = 0.10
-        self.sudden_workload_multiplier = 1.5
+        self.scheduled_job_interval = 20 
+        self.event_trigger_chance = 0.25 
+        self.sudden_workload_chance = 0.10 
+        self.sudden_workload_multiplier = 1.5 
 
         self.metrics: Dict[str, Any] = {
             'framework_variant': framework_variant,
             'jobs_generated': 0, 'jobs_assigned':0, 'jobs_completed_on_time': 0,
             'jobs_completed_late': 0, 'jobs_failed_deadline': 0, 'jobs_failed_internal': 0,
-            'total_work_units_processed': 0, 'avg_job_completion_time': 0, 'avg_job_tardiness': 0,
+            'total_work_units_processed': 0, 'avg_job_completion_time': 0.0, 'avg_job_tardiness': 0.0,
             'device_cycles_working': {}, 'device_cycles_idle': {},
             'total_rewards_earned': 0, 'total_penalties_incurred': 0,
             'qoe_interaction_samples': [], 'avg_trust_at_end': "N/A",
@@ -116,9 +167,13 @@ class BuildingSimulationComplex:
             'successful_negotiations': 0, 'failed_negotiations': 0,
             'misuse_incidents_detected': 0,
             'back_me_invocations_successful': 0, 'back_me_invocations_failed': 0,
+            # Initialize new misuse metrics to 0
+            'selfish_rejections': 0,
+            'faulty_device_actions_failed': 0,
+            'unresponsive_device_rejections': 0,
+            'total_policy_violations_blamed': 0, # Will be calculated in report()
         }
-        self.logger.log_info("SIM_INIT", f"BuildingSimulationComplex ({self.framework_variant}) | Devices: approx {self.num_devices_approx} | Zones: {num_zones} | Duration: {self.time_frame}m",
-                             context_override=self.run_context_name)
+        self.logger.log_info(self.run_context_name, f"BuildingSimulationComplex ({self.framework_variant}) | Devices: approx {self.num_devices_approx} | Zones: {num_zones} | Duration: {self.time_frame}m")
 
     def _get_next_job_id(self) -> str:
         self.next_job_id_counter += 1
@@ -135,29 +190,34 @@ class BuildingSimulationComplex:
         dev_id_counter = 0
         base_starting_balance = 1000
         min_income_per_period = self.metrics.get('min_income_check_interval', 60) * 0.5
+        # For BuildingSimulationComplex, devices are "normal" by default
+        default_behavior_params = {'behavior_profile': 'normal', 'fault_probability': 0.0, 
+                                   'unresponsive_probability': 0.0, 'deception_factor': 1.0}
 
         bms_id = f"bldg_cplx_bms_{dev_id_counter}"; dev_id_counter+=1
         self.bms = CompositeDevice(bms_id, "CentralBMS_Complex", max_load=500,
                                    capabilities=["coordinate_zones", "set_global_policy", "emergency_response", "energy_management", "assign_global_jobs"],
-                                   framework_variant=self.framework_variant, logger_instance=self.logger, current_minute_provider=lambda: self.current_minute)
+                                   framework_variant=self.framework_variant, logger_instance=self.logger, current_minute_provider=lambda: self.current_minute,
+                                   **default_behavior_params)
         self.bms.balance = base_starting_balance * 2
         self.bms.min_acceptable_income_threshold = min_income_per_period * 2
         self.bms.sim_metrics_ref = self.metrics
         self.devices.append(self.bms)
-        self.logger.log_info("DEV_SETUP", f"Created {self.bms.nameShort()}", context_override=self.run_context_name)
+        self.logger.log_info(self.run_context_name, f"Created {self.bms.nameShort()}")
 
         for zone_idx, zone_name in enumerate(self.zones):
             zc_id = f"bldg_cplx_zc{zone_idx+1}_{dev_id_counter}"; dev_id_counter+=1
-            zone_controller = CompositeDevice(zc_id, f"ZoneCtrl_Complex_{zone_name}", max_load=250,
+            zone_controller = CompositeDevice(zc_id, f"ZoneCtrl_Complex_{zone_name}", max_load=250, 
                                               capabilities=["manage_hvac", "manage_lighting", "zone_security_local", "delegate_zone_tasks", "access_control_zone"],
-                                              framework_variant=self.framework_variant, logger_instance=self.logger, current_minute_provider=lambda: self.current_minute)
+                                              framework_variant=self.framework_variant, logger_instance=self.logger, current_minute_provider=lambda: self.current_minute,
+                                              **default_behavior_params)
             setattr(zone_controller, 'zone', zone_name)
             zone_controller.balance = base_starting_balance * 1.5
             zone_controller.min_acceptable_income_threshold = min_income_per_period * 1.5
             zone_controller.sim_metrics_ref = self.metrics
             self.devices.append(zone_controller)
             self.zone_controllers[zone_name] = zone_controller
-            self.logger.log_info("DEV_SETUP", f"Created {zone_controller.nameShort()} for {zone_name}", context_override=self.run_context_name)
+            self.logger.log_info(self.run_context_name, f"Created {zone_controller.nameShort()} for {zone_name}")
 
             if self.framework_variant in ["social_basic", "full_siot"] and self.bms:
                 self.bms.add_worker(zone_controller, constraints={'role': 'zone_management', 'zone': zone_name})
@@ -167,19 +227,22 @@ class BuildingSimulationComplex:
                 dev_id = f"bldg_cplx_d{dev_id_counter}_{zone_name[:2].lower()}{i}"; dev_id_counter+=1
                 dev_type_roll = random.random()
                 primitive_device: Optional[Device] = None
-                common_args = {'framework_variant': self.framework_variant, 'logger_instance': self.logger, 'current_minute_provider': lambda: self.current_minute}
+                common_args_init = {'framework_variant': self.framework_variant, 
+                                'logger_instance': self.logger, 
+                                'current_minute_provider': lambda: self.current_minute,
+                                **default_behavior_params} 
 
                 if dev_type_roll < 0.4:
                     sensor_kind = random.choice(["temperature", "occupancy", "light_level", "co2", "door_contact", "window_contact", "power_meter", "card_reader"])
-                    if sensor_kind == "card_reader": primitive_device = CardReaderSensor(dev_id, f"CRSens_Cplx_{zone_name}_{i+1}", **common_args)
-                    elif sensor_kind == "power_meter": primitive_device = PowerMeterSensor(dev_id, f"PMSens_Cplx_{zone_name}_{i+1}", zone_name=zone_name, **common_args)
-                    else: primitive_device = SensingDevice(dev_id, f"{sensor_kind.capitalize()}Sens_Cplx_{zone_name}_{i+1}", sensor_type=sensor_kind, **common_args)
+                    if sensor_kind == "card_reader": primitive_device = CardReaderSensor(dev_id, f"CRSens_Cplx_{zone_name}_{i+1}", **common_args_init)
+                    elif sensor_kind == "power_meter": primitive_device = PowerMeterSensor(dev_id, f"PMSens_Cplx_{zone_name}_{i+1}", zone_name=zone_name, **common_args_init)
+                    else: primitive_device = SensingDevice(dev_id, f"{sensor_kind.capitalize()}Sens_Cplx_{zone_name}_{i+1}", sensor_type=sensor_kind, **common_args_init)
                 elif dev_type_roll < 0.8:
                     actuator_kind = random.choice(["hvac_control", "light_switch", "smart_blind", "door_lock", "smart_plug", "alarm_siren"])
-                    if actuator_kind == "smart_plug": primitive_device = SmartPlugActuator(dev_id, f"SPlug_Cplx_{zone_name}_{i+1}", **common_args)
-                    else: primitive_device = ActuatingDevice(dev_id, f"{actuator_kind.capitalize()}Act_Cplx_{zone_name}_{i+1}", actuator_type=actuator_kind, **common_args)
+                    if actuator_kind == "smart_plug": primitive_device = SmartPlugActuator(dev_id, f"SPlug_Cplx_{zone_name}_{i+1}", **common_args_init)
+                    else: primitive_device = ActuatingDevice(dev_id, f"{actuator_kind.capitalize()}Act_Cplx_{zone_name}_{i+1}", actuator_type=actuator_kind, **common_args_init)
                 else:
-                    primitive_device = CommunicatingDevice(dev_id, f"Comm_Cplx_{zone_name}_{i+1}", **common_args)
+                    primitive_device = CommunicatingDevice(dev_id, f"Comm_Cplx_{zone_name}_{i+1}", **common_args_init)
 
                 if primitive_device:
                     setattr(primitive_device, 'zone', zone_name)
@@ -193,7 +256,6 @@ class BuildingSimulationComplex:
         actual_device_count = len(self.devices)
         self.metrics['device_cycles_working'] = {dev.device_id: 0 for dev in self.devices}
         self.metrics['device_cycles_idle'] = {dev.device_id: 0 for dev in self.devices}
-
         if self.framework_variant in ["social_basic", "full_siot"]:
             all_composites = ([self.bms] if self.bms else []) + list(self.zone_controllers.values())
             for i_comp in range(len(all_composites)):
@@ -209,78 +271,74 @@ class BuildingSimulationComplex:
                         if potential_backups:
                             backup_dev = random.choice(potential_backups)
                             dev.add_relationship('back_me', backup_dev)
-        self.logger.log_info("DEV_SETUP_COMPLETE", f"Total devices for Complex Sim: {actual_device_count}. Framework: {self.framework_variant}", context_override=self.run_context_name)
-
+        self.logger.log_info(self.run_context_name, f"Total devices for Complex Sim: {actual_device_count}. Framework: {self.framework_variant}")
 
     def _generate_jobs(self):
+        # ... (Job generation logic - same as building_simulation_complex_v1) ...
         if self.current_minute % (self.scheduled_job_interval // 2) == 0:
             for zone in self.zones:
-                if random.random() < 0.5:
+                if random.random() < 0.5: 
                     job_type = "HVAC_ADJUST"
                     target_temp = random.randint(19, 24)
-                    current_temp_sim = target_temp + random.randint(-4, 4)
+                    current_temp_sim = target_temp + random.randint(-4, 4) 
                     params = {'target_temp': target_temp, 'current_temp_simulated': current_temp_sim, 'reason': "Scheduled Comfort/Occupancy"}
-                    work = random.randint(8, 15)
-                    deadline = self.current_minute + random.randint(work + 5, work + 25)
-                    reward = work * 8 + (25 - abs(target_temp - 21)*3)
-                    priority = 2
-                    if random.random() < 0.25: params['priority_override'] = 1; priority = 1
+                    work = random.randint(8, 15) 
+                    deadline = self.current_minute + random.randint(work + 5, work + 25) 
+                    reward = work * 8 + (25 - abs(target_temp - 21)*3) 
+                    priority = 2 
+                    if random.random() < 0.25: params['priority_override'] = 1; priority = 1 
                     job = BuildingJob(self._get_next_job_id(), self.current_minute, job_type, zone, work, deadline, int(reward), params, priority=priority)
                     self.job_queue.append(job)
                     self.metrics['jobs_generated'] += 1
 
-        if random.random() < self.event_trigger_chance :
-            num_access_attempts = random.randint(1, max(2, self.num_zones // 2 + 1))
+        if random.random() < self.event_trigger_chance : 
+            num_access_attempts = random.randint(1, max(2, self.num_zones // 2 + 1)) 
             for _ in range(num_access_attempts):
                 target_zone_for_access = random.choice(self.zones)
                 job_type = "ACCESS_REQUEST"
-                user_id = f"user{random.randint(101,150)}"
+                user_id = f"user{random.randint(101,150)}" 
                 params = {'user_id': user_id, 'door_id': f"Door_{target_zone_for_access}_MainEntry", 'access_level_required': random.randint(1,3)}
-                work = random.randint(3,6)
-                deadline = self.current_minute + random.randint(2, 4)
+                work = random.randint(3,6) 
+                deadline = self.current_minute + random.randint(2, 4) 
                 reward = work * 7
-                priority = 1
+                priority = 1 
                 job = BuildingJob(self._get_next_job_id(), self.current_minute, job_type, target_zone_for_access, work, deadline, reward, params, priority=priority)
                 self.job_queue.append(job)
                 self.metrics['jobs_generated'] += 1
 
-        if self.current_minute > 0 and self.current_minute % (self.time_frame // 5) == 0 and random.random() < 0.75:
+        if self.current_minute > 0 and self.current_minute % (self.time_frame // 5) == 0 and random.random() < 0.75: 
             influx_zone = random.choice(self.zones)
             num_influx = random.randint(int(max(3,self.devices_per_zone_avg) * self.sudden_workload_multiplier),
                                         int(max(4,self.devices_per_zone_avg * 2) * self.sudden_workload_multiplier))
-            self.logger.log_info("JOB_GEN_EVENT", f"SUDDEN INFLUX of {num_influx} access requests for {influx_zone}", context_override=self.run_context_name)
+            self.logger.log_info(self.run_context_name, f"SUDDEN INFLUX of {num_influx} access requests for {influx_zone}")
             for i in range(num_influx):
                 job = BuildingJob(self._get_next_job_id(), self.current_minute, "ACCESS_REQUEST", influx_zone,
-                                  random.randint(2,4), self.current_minute + 1 + i//4, # Very tight, staggered
+                                  random.randint(2,4), self.current_minute + 1 + i//4, 
                                   10, {'user_id': f"influx_user{i}", 'door_id': f"Door_{influx_zone}_Entry{i%2+1}"}, priority=1)
                 self.job_queue.append(job)
                 self.metrics['jobs_generated'] += 1
 
-        if self.current_minute > 0 and self.current_minute % self.scheduled_job_interval == 0:
-            if random.random() < 0.45:
-                target_zone_energy = random.choice(self.zones + [None])
+        if self.current_minute > 0 and self.current_minute % self.scheduled_job_interval == 0: 
+            if random.random() < 0.45: 
+                target_zone_energy = random.choice(self.zones + [None]) 
                 job_type = "OPTIMIZE_ZONE_ENERGY" if target_zone_energy else "BUILDING_ENERGY_STRATEGY"
                 params = {'reason': "Scheduled Review/Optimization"}
                 if target_zone_energy and random.random() < 0.6:
-                    params['target_reduction_kwh_simulated'] = random.uniform(0.5, 2.0)
-                elif not target_zone_energy:
+                    params['target_reduction_kwh_simulated'] = random.uniform(0.5, 2.0) 
+                elif not target_zone_energy: 
                     params['mode'] = random.choice(["PEAK_DEMAND_AVOIDANCE", "NIGHT_SETBACK", "LOAD_BALANCING"])
-
-                work = random.randint(10, 25) if target_zone_energy else random.randint(15,30)
-                deadline = self.current_minute + random.randint(work + 10, work + 45)
+                work = random.randint(10, 25) if target_zone_energy else random.randint(15,30) 
+                deadline = self.current_minute + random.randint(work + 10, work + 45) 
                 reward = work * 6
-                priority = 3
+                priority = 3 
                 job = BuildingJob(self._get_next_job_id(), self.current_minute, job_type, target_zone_energy, work, deadline, reward, params, priority=priority)
                 self.job_queue.append(job)
                 self.metrics['jobs_generated'] += 1
-
         self.job_queue = deque(sorted(list(self.job_queue), key=lambda j: (j.priority, j.deadline_time)))
 
 
     def _assign_jobs_to_devices(self):
-        # This method is identical to the one in building_simulation_enhanced_v1
-        # Assigns jobs from the sorted queue to available/suitable devices based on framework_variant
-        # For brevity, I'm not repeating the full code here.
+        # ... (Same as building_simulation_complex_v1) ...
         jobs_assigned_this_round_ids = set()
         for job in list(self.job_queue):
             if job.id in jobs_assigned_this_round_ids or job.status != "PENDING":
@@ -314,8 +372,8 @@ class BuildingSimulationComplex:
                     suitable_devices = []
                     if "HVAC" in job.job_type or "TEMP" in job.job_type: suitable_devices = [d for d in candidate_devices_in_zone if isinstance(d, (ActuatingDevice, SensingDevice, CompositeDevice)) and any(cap in d.capabilities for cap in ["hvac_control", "temperature", "manage_hvac"])]
                     elif "LIGHT" in job.job_type: suitable_devices = [d for d in candidate_devices_in_zone if isinstance(d, (ActuatingDevice, SensingDevice, CompositeDevice)) and any(cap in d.capabilities for cap in ["light_switch", "light_level", "manage_lighting"])]
-                    elif "ACCESS" in job.job_type: suitable_devices = [d for d in candidate_devices_in_zone if isinstance(d, (CardReaderSensor, ActuatingDevice, CompositeDevice)) and any(cap in d.capabilities for cap in ["card_swipe", "door_lock", "access_control_zone"])]
-                    elif "ENERGY" in job.job_type: suitable_devices = [d for d in candidate_devices_in_zone if isinstance(d, (PowerMeterSensor, SmartPlugActuator, CompositeDevice)) and any(cap in d.capabilities for cap in ["power_usage", "smart_plug", "energy_management"])]
+                    elif "ACCESS" in job.job_type: suitable_devices = [d for d in candidate_devices_in_zone if isinstance(d, CardReaderSensor) or (isinstance(d, ActuatingDevice) and "door_lock" in d.actuator_type) or (isinstance(d, CompositeDevice) and "access" in d.capabilities)]
+                    elif "ENERGY" in job.job_type: suitable_devices = [d for d in candidate_devices_in_zone if isinstance(d, PowerMeterSensor) or isinstance(d, SmartPlugActuator) or (isinstance(d, CompositeDevice) and "energy" in d.capabilities)]
                     if not suitable_devices: suitable_devices = candidate_devices_in_zone 
                     if suitable_devices: assigned_entity = min(suitable_devices, key=lambda d: d.current_load) 
             if assigned_entity:
@@ -326,29 +384,20 @@ class BuildingSimulationComplex:
                 self.active_jobs[job.id] = job
                 if job in self.job_queue: self.job_queue.remove(job)
                 jobs_assigned_this_round_ids.add(job.id)
-                self.logger.log_info("JOB_ASSIGN", f"Job {job.id} ({job.job_type} P{job.priority} for {job.target_zone if job.target_zone else 'BUILDING'}) assigned to {assigned_entity.nameShort()}", context_override=self.run_context_name)
+                self.logger.log_info(self.run_context_name, f"Job {job.id} ({job.job_type} P{job.priority} for {job.target_zone if job.target_zone else 'BUILDING'}) assigned to {assigned_entity.nameShort()}")
         self.job_queue = deque(sorted(list(self.job_queue), key=lambda j: (j.priority, j.deadline_time)))
 
 
     def _process_device_job(self, device: Device, job: BuildingJob):
-        # This method is largely identical to the one in building_simulation_enhanced_v1
-        # It handles job processing based on framework_variant, including delegation for CompositeDevices.
-        # For brevity, I'm not repeating the full code here.
-        # Key aspects:
-        # - Consumes base_work_load.
-        # - Baseline: Simulates simpler/slower progress.
-        # - SIoT modes: CompositeDevices delegate (BMS to ZC, ZC to primitives for HVAC, ACCESS, ENERGY jobs).
-        # - Updates job.work_units_done and relevant metrics.
-        # - Checks for job completion (on_time/late) or failure (internal/deadline).
-        # - Updates device.current_job_id.
+        # ... (Same as building_simulation_complex_v1, including logging fixes) ...
         if device.current_load >= device.max_load * 0.95:
-            self.logger.log_info("JOB_PROGRESS", f"Device {device.nameShort()} on Job {job.id} is CRITICALLY OVERLOADED (load: {device.current_load}), no progress.", context_override=self.run_context_name)
+            self.logger.log_info(self.run_context_name, f"Device {device.nameShort()} on Job {job.id} is CRITICALLY OVERLOADED (load: {device.current_load}), no progress.")
             self.metrics['device_cycles_idle'][device.device_id] +=1
             return
 
         base_work_load = 15 if isinstance(device, CompositeDevice) else 8
         if not device.consume_load(base_work_load):
-            self.logger.log_info("JOB_PROGRESS", f"Device {device.nameShort()} on Job {job.id} FAILED to consume its base work load {base_work_load}.", context_override=self.run_context_name)
+            self.logger.log_info(self.run_context_name, f"Device {device.nameShort()} on Job {job.id} FAILED to consume its base work load {base_work_load}.")
             self.metrics['device_cycles_idle'][device.device_id] +=1
             return
 
@@ -365,15 +414,14 @@ class BuildingSimulationComplex:
                 work_units_completed_this_cycle = random.uniform(0.3, 0.8) 
             elif not isinstance(device, CompositeDevice) and job.job_type not in device.capabilities:
                 work_units_completed_this_cycle = random.uniform(0.1, 0.4) 
-                # Corrected line: Use log_event with level 'debug'
-                self.logger.log_event("JOB_PROGRESS_BASELINE", f"Baseline primitive {device.nameShort()} struggling with complex job {job.job_type}", level='debug', context_override=self.run_context_name)
+                device.log_debug(f"Baseline primitive {device.nameShort()} struggling with complex job {job.job_type}", context_override=self.run_context_name)
             else:
                 work_units_completed_this_cycle = 1.0 
         elif self.framework_variant in ["social_basic", "full_siot"]:
             if isinstance(device, CompositeDevice): 
                 if device == self.bms and job.target_zone is None: 
                     if job.job_type == "BUILDING_ENERGY_STRATEGY":
-                        self.logger.log_info("BMS_JOB", f"BMS {device.nameShort()} processing {job.job_type} for job {job.id}", context_override=self.run_context_name)
+                        self.logger.log_info(self.run_context_name, f"BMS {device.nameShort()} processing {job.job_type} for job {job.id}")
                         successful_zc_coordination = 0
                         for zc_name, zc_device in self.zone_controllers.items():
                             self.metrics['delegation_to_zone_controller_count'] +=1 
@@ -387,25 +435,29 @@ class BuildingSimulationComplex:
                              work_units_completed_this_cycle = 1.0 * (successful_zc_coordination / len(self.zone_controllers)) 
                         else:
                             job_failed_internally_this_cycle = True
-                            self.logger.log_warning("BMS_JOB_FAIL", f"BMS Job {job.id} failed, insufficient ZC coordination.", context_override=self.run_context_name)
+                            self.logger.log_warning(self.run_context_name, f"BMS Job {job.id} failed, insufficient ZC coordination.")
                     else: 
                         work_units_completed_this_cycle = random.uniform(0.6, 1.1) 
                 elif hasattr(device, 'zone') and device == self.zone_controllers.get(job.target_zone): 
-                    self.logger.log_info("ZC_JOB", f"ZC {device.nameShort()} processing {job.job_type} for job {job.id} in zone {job.target_zone}", context_override=self.run_context_name)
+                    self.logger.log_info(self.run_context_name, f"ZC {device.nameShort()} processing {job.job_type} for job {job.id} in zone {job.target_zone}")
                     if job.job_type == "HVAC_ADJUST":
                         outcome_details = device._delegate_to_worker('sense', device, 5, {**task_details_for_subtask, 'sensor_type': 'temperature'}) 
                         job.sub_task_results.append({'hvac_sense': outcome_details})
                         if outcome_details.get('success'):
                             current_temp = outcome_details.get('value', job.parameters.get('current_temp_simulated', 25))
                             target_temp = job.parameters.get('target_temp', 22)
-                            if abs(current_temp - target_temp) > 0.5:
+                            if isinstance(current_temp, (int,float)) and abs(current_temp - target_temp) > 0.5: 
                                 act_details = {**task_details_for_subtask, 'command': {'mode': "HEAT" if current_temp < target_temp else "COOL", 'setpoint': target_temp}, 'actuator_type': 'hvac_control'}
                                 act_outcome = device._delegate_to_worker('actuate', device, 10, act_details)
                                 job.sub_task_results.append({'hvac_actuate': act_outcome})
                                 if act_outcome.get('success'): work_units_completed_this_cycle = 1.0
                                 else: job_failed_internally_this_cycle = True
-                            else:
+                            elif not isinstance(current_temp, (int,float)):
+                                self.logger.log_warning(self.run_context_name, f"HVAC Job {job.id} received non-numeric temp: {current_temp} from sensor.")
+                                job_failed_internally_this_cycle = True
+                            else: 
                                 work_units_completed_this_cycle = 1.0 
+                                job.sub_task_results.append({'hvac_already_optimal': True})
                         else: job_failed_internally_this_cycle = True
                     elif job.job_type == "ACCESS_REQUEST":
                         swipe_outcome = device._delegate_to_worker('sense', device, 5, {**task_details_for_subtask, 'sensor_type': 'card_swipe', 'simulated_card_user': job.parameters.get('user_id')})
@@ -416,7 +468,7 @@ class BuildingSimulationComplex:
                             if self.framework_variant == "full_siot":
                                 if device.trust_score < 40 and job.parameters.get('access_level_required',1) > 2 :
                                     access_granted = False; self.metrics['failed_negotiations'] += 1
-                                    self.logger.log_info("ACCESS_POLICY", f"Job {job.id} access denied by ZC policy (low ZC trust, high level req).", context_override=self.run_context_name)
+                                    self.logger.log_info(self.run_context_name, f"Job {job.id} access denied by ZC policy (low ZC trust, high level req).")
                             if access_granted:
                                 unlock_outcome = device._delegate_to_worker('actuate', device, 5, {**task_details_for_subtask, 'command': "UNLOCK", 'actuator_type': 'door_lock'})
                                 job.sub_task_results.append({'access_unlock': unlock_outcome})
@@ -459,10 +511,9 @@ class BuildingSimulationComplex:
             self.metrics['total_work_units_processed'] += work_units_completed_this_cycle
             self.metrics['device_cycles_working'][device.device_id] +=1
             if work_units_completed_this_cycle > 0:
-                self.logger.log_info("JOB_PROGRESS", f"{device.nameShort()} on Job {job.id} P{job.priority}: {job.work_units_done:.1f}/{job.work_units_required} WU. Load: {device.current_load}", context_override=self.run_context_name)
-            else: 
-                self.logger.log_event("JOB_PROGRESS", f"{device.nameShort()} on Job {job.id} P{job.priority}: NO PROGRESS this cycle. Load: {device.current_load}", level='debug', context_override=self.run_context_name)
-                self.metrics['device_cycles_idle'][device.device_id] +=1 
+                device.log_info(f"on Job {job.id} P{job.priority}: {job.work_units_done:.1f}/{job.work_units_required} WU. Load: {device.current_load}", context_override=self.run_context_name)
+            elif not job_failed_internally_this_cycle: 
+                device.log_debug(f"on Job {job.id} P{job.priority}: NO PROGRESS this cycle. Load: {device.current_load}", context_override=self.run_context_name)
         else: 
              self.metrics['device_cycles_idle'][device.device_id] +=1
 
@@ -472,7 +523,7 @@ class BuildingSimulationComplex:
             self.metrics['jobs_failed_internal'] += 1
             device.receive_penalty(job.penalty_for_failure * 0.75, "System", f"Job {job.id} failed due to internal sub-task failure.") 
             self.metrics['total_penalties_incurred'] += job.penalty_for_failure * 0.75
-            self.logger.log_info("JOB_FAIL", f"Job {job.id} ({job.job_type} P{job.priority}) FAILED INTERNALLY on {device.nameShort()}.", context_override=self.run_context_name)
+            self.logger.log_info(self.run_context_name, f"Job {job.id} ({job.job_type} P{job.priority}) FAILED INTERNALLY on {device.nameShort()}.")
             self.processed_jobs.append(job)
             if job.id in self.active_jobs: del self.active_jobs[job.id]
             setattr(device, 'current_job_id', None)
@@ -486,14 +537,14 @@ class BuildingSimulationComplex:
                 self.metrics['jobs_completed_on_time'] += 1
                 device.receive_income(job.base_reward, f"{status_log_prefix} on time")
                 self.metrics['total_rewards_earned'] += job.base_reward
-                self.logger.log_info("JOB_COMPLETE", f"{status_log_prefix} COMPLETED ON TIME by {device.nameShort()}. Reward: {job.base_reward}", context_override=self.run_context_name)
+                self.logger.log_info(self.run_context_name, f"{status_log_prefix} COMPLETED ON TIME by {device.nameShort()}. Reward: {job.base_reward}")
             else:
                 job.status = "COMPLETED_LATE"
                 self.metrics['jobs_completed_late'] += 1
                 reduced_reward = int(job.base_reward * 0.6)
                 device.receive_income(reduced_reward, f"{status_log_prefix} late")
                 self.metrics['total_rewards_earned'] += reduced_reward
-                self.logger.log_info("JOB_COMPLETE", f"{status_log_prefix} COMPLETED LATE by {device.nameShort()}. Reward: {reduced_reward}", context_override=self.run_context_name)
+                self.logger.log_info(self.run_context_name, f"{status_log_prefix} COMPLETED LATE by {device.nameShort()}. Reward: {reduced_reward}")
             self.processed_jobs.append(job)
             if job.id in self.active_jobs: del self.active_jobs[job.id]
             setattr(device, 'current_job_id', None)
@@ -503,18 +554,14 @@ class BuildingSimulationComplex:
             self.metrics['jobs_failed_deadline'] += 1
             device.receive_penalty(job.penalty_for_failure, "System", f"Job {job.id} missed deadline")
             self.metrics['total_penalties_incurred'] += job.penalty_for_failure
-            self.logger.log_info("JOB_FAIL", f"Job {job.id} ({job.job_type} P{job.priority}) FAILED DEADLINE on {device.nameShort()}. Penalty: {job.penalty_for_failure}", context_override=self.run_context_name)
+            self.logger.log_info(self.run_context_name, f"Job {job.id} ({job.job_type} P{job.priority}) FAILED DEADLINE on {device.nameShort()}. Penalty: {job.penalty_for_failure}")
             self.processed_jobs.append(job)
             if job.id in self.active_jobs: del self.active_jobs[job.id]
             setattr(device, 'current_job_id', None)
 
-
     def simulate_cycle(self, minute: int):
-        # This method is identical to the one in building_simulation_enhanced_v1
-        # Manages the simulation loop for one minute: generate jobs, assign jobs, process device actions.
-        # For brevity, I'm not repeating the full code here.
         self.current_minute = minute
-        self.logger.log_info("CYCLE_START", f"Minute: {self.current_minute} ({self.framework_variant})", context_override=self.run_context_name)
+        self.logger.log_info(self.run_context_name, f"Minute: {self.current_minute} ({self.framework_variant})")
         self._generate_jobs() 
         self._assign_jobs_to_devices() 
         active_job_ids_processed_this_cycle = set()
@@ -525,12 +572,12 @@ class BuildingSimulationComplex:
                 if job.assigned_to_device_id == device.device_id and job.status in ["ASSIGNED", "IN_PROGRESS"]:
                     if job.status == "ASSIGNED":
                         job.status = "IN_PROGRESS"
-                        self.logger.log_info("JOB_START", f"Device {device.nameShort()} starting Job {job.id} ({job.job_type} P{job.priority})", context_override=self.run_context_name)
+                        self.logger.log_info(self.run_context_name, f"Device {device.nameShort()} starting Job {job.id} ({job.job_type} P{job.priority})")
                     if job.status == "IN_PROGRESS": 
                         self._process_device_job(device, job)
                         active_job_ids_processed_this_cycle.add(job.id) 
                 elif job.assigned_to_device_id != device.device_id and current_job_id_attr == job.id:
-                    self.logger.log_warning("STATE_MISMATCH", f"Device {device.nameShort()} thought it had job {job.id}, but job is assigned to {job.assigned_to_device_id}. Clearing.", context_override=self.run_context_name)
+                    self.logger.log_warning(self.run_context_name, f"Device {device.nameShort()} thought it had job {job.id}, but job is assigned to {job.assigned_to_device_id}. Clearing.")
                     setattr(device, 'current_job_id', None)
             else: 
                  if current_job_id_attr and current_job_id_attr not in self.active_jobs: 
@@ -557,11 +604,10 @@ class BuildingSimulationComplex:
             if job.status == "PENDING" and self.current_minute > job.deadline_time and job.id not in active_job_ids_processed_this_cycle:
                 job.status = "FAILED_DEADLINE_UNASSIGNED"
                 self.metrics['jobs_failed_deadline'] += 1
-                self.logger.log_info("JOB_FAIL_QUEUE", f"Job {job.id} ({job.job_type} P{job.priority}) FAILED DEADLINE (unassigned from queue).", context_override=self.run_context_name)
+                self.logger.log_info(self.run_context_name, f"Job {job.id} ({job.job_type} P{job.priority}) FAILED DEADLINE (unassigned from queue).")
                 self.processed_jobs.append(job)
                 if job in self.job_queue: self.job_queue.remove(job)
-        self.logger.log_info("CYCLE_END", f"Minute: {self.current_minute} | Pending Jobs: {len(self.job_queue)} | Active Jobs: {len(self.active_jobs)}", context_override=self.run_context_name)
-
+        self.logger.log_info(self.run_context_name, f"Minute: {self.current_minute} | Pending Jobs: {len(self.job_queue)} | Active Jobs: {len(self.active_jobs)}")
 
     def run(self):
         self.setup_devices()
@@ -569,21 +615,16 @@ class BuildingSimulationComplex:
             self.simulate_cycle(minute_cycle)
             if minute_cycle > 0 and (minute_cycle % (self.time_frame // 20 if self.time_frame >=20 else 1) == 0 or minute_cycle == self.time_frame -1) :
                  failed_total = self.metrics['jobs_failed_deadline'] + self.metrics['jobs_failed_internal']
-                 self.logger.log_info("PERIODIC_SUM", f"Min {minute_cycle} | Jobs (Pend/Act/Fail): {len(self.job_queue)}/{len(self.active_jobs)}/{failed_total} | Comp(OK/Late):{self.metrics['jobs_completed_on_time']}/{self.metrics['jobs_completed_late']}", context_override=self.run_context_name)
+                 self.logger.log_info(self.run_context_name, f"Min {minute_cycle} | Jobs (Pend/Act/Fail): {len(self.job_queue)}/{len(self.active_jobs)}/{failed_total} | Comp(OK/Late):{self.metrics['jobs_completed_on_time']}/{self.metrics['jobs_completed_late']}")
         self.report()
 
     def report(self):
-        # This method is identical to the one in building_simulation_enhanced_v1
-        # Calculates and logs final simulation metrics.
-        # For brevity, I'm not repeating the full code here.
-        # Key aspects:
-        # - Calculates avg_job_completion_time, avg_job_tardiness.
-        # - Calculates final_total_balance_network, total_income_generated_network.
-        # - Calculates avg_trust_at_end for SIoT modes.
-        # - Logs a summary report.
-        # - Stores metrics using self.logger.store_simulation_metrics with key "building_complex_{framework_variant}".
-        report_context = f"BldgComplexReport_{self.framework_variant}" # Unique report context
-        self.logger.log_info("FINAL_REPORT_START", "\n" + "="*25 + f" BUILDING SIMULATION COMPLEX FINAL REPORT ({self.framework_variant}) " + "="*25, context_override=report_context)
+        report_context = f"BldgCplxReport_{self.framework_variant}" 
+        self.logger.log_info(report_context, "\n" + "="*25 + f" BUILDING SIMULATION COMPLEX FINAL REPORT ({self.framework_variant}) " + "="*25)
+        
+        # Ensure total_policy_violations_blamed is calculated
+        self.metrics['total_policy_violations_blamed'] = sum(d.blame_count for d in self.devices if hasattr(d, 'blame_count'))
+
         total_completed = self.metrics['jobs_completed_on_time'] + self.metrics['jobs_completed_late']
         if total_completed > 0:
             completion_times = [job.completion_time - job.creation_time for job in self.processed_jobs if job.status.startswith("COMPLETED") and job.completion_time != -1 and hasattr(job, 'creation_time') and job.creation_time != -1]
@@ -622,6 +663,7 @@ class BuildingSimulationComplex:
             f"Total Penalties Incurred by Devices (from jobs): {self.metrics['total_penalties_incurred']:.0f}",
             f"Final Total Network Balance: {self.metrics['final_total_balance_network']:.0f}",
             f"Average Final Trust (Social Modes only): {avg_trust_display}",
+            "--- SIoT & Behavior Metrics ---",
             f"Delegations to Zone Controllers (by BMS): {self.metrics['delegation_to_zone_controller_count']}",
             f"Delegations to Primitives (by ZC/BMS): {self.metrics['delegation_to_primitive_count']}",
             f"Successful Back-me Invocations: {self.metrics['back_me_invocations_successful']}",
@@ -629,10 +671,14 @@ class BuildingSimulationComplex:
             f"Successful Negotiations (Full SIoT): {self.metrics['successful_negotiations']}",
             f"Failed Negotiations (Full SIoT): {self.metrics['failed_negotiations']}",
             f"Misuse Incidents Detected (Full SIoT): {self.metrics['misuse_incidents_detected']}",
+            f"Selfish Rejections: {self.metrics.get('selfish_rejections',0)}",
+            f"Faulty Device Actions Failed: {self.metrics.get('faulty_device_actions_failed',0)}",
+            f"Unresponsive Device Rejections: {self.metrics.get('unresponsive_device_rejections',0)}",
+            f"Total Policy Violations Blamed: {self.metrics.get('total_policy_violations_blamed',0)}"
         ]
-        self.logger.log_info("OVERALL_SIM_SUMMARY", "\n".join(summary_report_lines), context_override=report_context)
+        self.logger.log_info(report_context, "\n".join(summary_report_lines))
         self.logger.store_simulation_metrics(
-            simulation_run_key=f"building_complex_{self.framework_variant.lower()}", # Ensure unique key
+            simulation_run_key=f"building_complex_{self.framework_variant.lower()}", 
             metrics_dict=self.metrics
         )
-        self.logger.log_info("FINAL_REPORT_END", "="*70, context_override=report_context)
+        self.logger.log_info(report_context, "="*70)
