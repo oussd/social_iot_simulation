@@ -28,7 +28,7 @@ class Device:
         self.capabilities = capabilities if capabilities is not None else []
         self.max_load = max_load
         self.current_load = 0
-        self.trust_score = 75.0 if framework_variant != "baseline" else 50.0
+        self.trust_score = 75.0 if framework_variant == "full_siot" else None
         
         self.relationships: Dict[str, List[Dict[str, Any]]] = {
             'work_with_me': [], 'work_for_me': [], 'controller_for': [],
@@ -183,14 +183,14 @@ class Device:
     def receive_penalty(self, penalty_amount: float, penalized_by: str = "System", reason: str = ""):
         self.balance -= penalty_amount; self.total_penalties_received += penalty_amount
         self.log_warning(f"Received penalty: {penalty_amount:.2f} from {penalized_by} for {reason}. New balance: {self.balance:.2f}")
-        if self.framework_variant != "baseline":
+        if self.framework_variant == "full_siot":
             direct_trust_hit = -10.0 
             self.trust_score = max(0.0, min(100.0, self.trust_score + direct_trust_hit))
             self.log_info(f"Direct trust hit from penalty: {direct_trust_hit:.1f}. New trust: {self.trust_score:.1f}")
 
     def check_min_income_satisfied(self):
         satisfied = self.current_period_income >= self.min_acceptable_income_threshold
-        if not satisfied and self.framework_variant != "baseline":
+        if not satisfied and self.framework_variant == "full_siot":
             self.log_warning(f"Min income ({self.min_acceptable_income_threshold:.2f}) not met for period (earned: {self.current_period_income:.2f}). Trust may be affected.")
         self.current_period_income = 0
         return satisfied
@@ -224,15 +224,7 @@ class Device:
         return None
 
     def negotiate_load(self, requested_load: int, from_device: Optional['Device'] = None, task_details: Optional[Dict]=None) -> bool:
-        if self.behavior_profile == 'selfish' and random.random() < self.policy.get('selfish_rejection_probability', 0.0) * 0.5:
-            self.log_info(f"Selfishly rejecting load negotiation for {requested_load} units from {from_device.nameShort() if from_device else 'N/A'}.")
-            if self.sim_metrics_ref: self.sim_metrics_ref['failed_negotiations'] = self.sim_metrics_ref.get('failed_negotiations',0) + 1
-            return False
-
-        can_take_load_basic = (self.current_load + requested_load <= self.max_load)
-        if not can_take_load_basic:
-            self.log_debug(f"NEGOTIATION REJECT (Overload): Cannot take {requested_load} (current: {self.current_load}, max: {self.max_load})")
-            if self.sim_metrics_ref: self.sim_metrics_ref['failed_negotiations'] = self.sim_metrics_ref.get('failed_negotiations',0) + 1
+        if self.current_load + requested_load > self.max_load:
             return False
 
         if self.framework_variant == "full_siot" and from_device:
@@ -253,8 +245,6 @@ class Device:
             self.log_debug(f"NEGOTIATION ACCEPT: Task from {from_device.nameShort()} accepted under full_siot policies.")
             if self.sim_metrics_ref: self.sim_metrics_ref['successful_negotiations'] = self.sim_metrics_ref.get('successful_negotiations',0) + 1
             return True
-        
-        if self.sim_metrics_ref and self.framework_variant != "baseline" : self.sim_metrics_ref['successful_negotiations'] = self.sim_metrics_ref.get('successful_negotiations',0) + 1
         return True
 
     def consume_load(self, load_amount: int) -> bool:
@@ -391,7 +381,7 @@ class Device:
 
     def update_trust_from_qoe(self, partner_device: Optional['Device'], task_type: str,
                               measured_qos_params: Dict[str, Any], interaction_role: str):
-        if self.framework_variant == "baseline": return
+        if self.framework_variant != "full_siot": return
         qoe_values_for_agg: List[int] = []
         log_qoe_details: List[str] = []
         announced_qos_set = {}
@@ -425,7 +415,7 @@ class Device:
             qoe = self._calculate_qoe_level_for_param('policy_adherence_binary', announced_val, measured_qos_params['policy_adherence_binary'])
             qoe_values_for_agg.append(qoe.value)
             log_qoe_details.append(f"PA:{qoe.name[0]}")
-        if self.framework_variant == "full_siot" and 'negotiation_success_binary' in measured_qos_params:
+        if 'negotiation_success_binary' in measured_qos_params:
             announced_val = announced_qos_set.get('negotiation_success_binary', 1.0)
             qoe = self._calculate_qoe_level_for_param('negotiation_success_binary', announced_val, measured_qos_params['negotiation_success_binary'])
             qoe_values_for_agg.append(qoe.value)
@@ -440,7 +430,7 @@ class Device:
         avg_qoe_numeric = sum(qoe_values_for_agg) / len(qoe_values_for_agg)
         delta_trust = (avg_qoe_numeric - QoELevel.FAIR.value) * self.trust_adjustment_factor
         delta_trust_multiplier = 1.0
-        if self.framework_variant == "full_siot" and partner_device:
+        if partner_device:
             rel_to_update_type = None
             if interaction_role == "performer":
                 if self.is_authorized_controller(partner_device): rel_to_update_type = 'work_for_me'
@@ -479,7 +469,6 @@ class Device:
             'timestamp': self.get_current_minute() }
         self.interaction_history.append(interaction_record)
         if len(self.interaction_history) > self.max_interaction_history_len: self.interaction_history.pop(0)
-
 
     def handle_request(self, from_device: Optional['Device'], task_type: str,
                        load_requested: int = 10, details: Optional[Dict] = None) -> Dict[str, Any]:
@@ -560,7 +549,7 @@ class Device:
                 'negotiation_qos': negotiation_qos_param}
 
     def report_status(self):
-        trust_str = f"Trust:{self.trust_score:.1f}" if self.framework_variant != "baseline" else "Trust:N/A"
+        trust_str = f"Trust:{self.trust_score:.1f}" if self.framework_variant == "full_siot" else "Trust:N/A"
         load_str = f"Load:{self.current_load}/{self.max_load}"
         bal_str = f"Bal:{self.balance:.0f}"
         profile_str = f"Profile:{self.behavior_profile}" if self.behavior_profile != "normal" else ""
@@ -577,7 +566,7 @@ class Device:
                         rels_summary.append(f"{key_short}:{active_count}")
         rel_str = f"Rel:[{','.join(rels_summary)}]" if rels_summary else ""
         status_parts = [part for part in [trust_str, bal_str, load_str, profile_str, unresp_str, rel_str] if part]
-        self.log_info(f"STATUS: {' '.join(status_parts)}", context_tag=self.nameShort()) # Use self.nameShort() as the primary tag for status
+        self.log_info(f"STATUS: {' '.join(status_parts)}", context_tag=self.nameShort())
 
     def select_worker_for_task(self, worker_list: List['Device'], task_description: str) -> Optional['Device']:
         if not worker_list: return None
@@ -593,7 +582,14 @@ class Device:
             if not available_workers:
                 self.log_debug(f"No available (non-overloaded/non-avoided/responsive) workers for task '{task_description}' among {len(worker_list)} candidates.")
                 return None
-            sorted_workers = sorted(available_workers, key=lambda w: (getattr(w, 'trust_score', 0), -w.current_load), reverse=True)
+            if self.framework_variant == "full_siot":
+                sorted_workers = sorted(available_workers, key=lambda w: (getattr(w, 'trust_score', 0), -w.current_load), reverse=True)
+            else:
+                sorted_workers = sorted(available_workers, key=lambda w: -w.current_load, reverse=True)
             selected_worker = sorted_workers[0]
-            self.log_debug(f"Selected worker {selected_worker.nameShort()} (Trust: {selected_worker.trust_score:.1f}, Load: {selected_worker.current_load}) for '{task_description}'.")
+            if self.framework_variant == "full_siot" and selected_worker.trust_score is not None:
+                trust_str = f"{selected_worker.trust_score:.1f}"
+            else:
+                trust_str = "N/A"
+            self.log_debug(f"Selected worker {selected_worker.nameShort()} (Trust: {trust_str}, Load: {selected_worker.current_load}) for '{task_description}'.")
             return selected_worker

@@ -59,18 +59,29 @@ class BuildingJob:
 
 class BuildingSimulationComplex_V2:
     def __init__(self, framework_variant: str = "full_siot",
-                 num_zones: int = 2, devices_per_zone_avg: int = 3,
+                 num_zones: int = 3, # Default to 3 zones for ~50 devices
+                 primitives_per_zone_dist: Optional[List[int]] = None, # Expect a list like [16, 15, 15]
                  duration_minutes: int = 240, logger_instance: Optional[SimulationLogger] = None,
                  run_context_name: str = "BldgComplexSimV2Run"):
 
         self.framework_variant = framework_variant
         self.num_zones = num_zones
-        self.devices_per_zone_avg = devices_per_zone_avg
-        self.num_devices_approx = (num_zones * devices_per_zone_avg) + num_zones + 1
+        
+        if primitives_per_zone_dist and len(primitives_per_zone_dist) == num_zones:
+            self.primitives_per_zone_dist = primitives_per_zone_dist
+        else:
+            # Fallback if not provided correctly, though main.py should ensure this.
+            default_avg_primitives = 15 
+            self.primitives_per_zone_dist = [default_avg_primitives] * num_zones
+            self.logger.log_warning(run_context_name, f"Primitives_per_zone_dist not provided or mismatched with num_zones. Using default average: {default_avg_primitives}")
+
+        self.num_devices_approx = 1 + self.num_zones + sum(self.primitives_per_zone_dist)
+
         self.devices: List[Device] = []
         self.zone_controllers: Dict[str, CompositeDevice] = {}
         self.bms: Optional[CompositeDevice] = None
-        self.zones: List[str] = [f"Zone{i+1}" for i in range(num_zones)]
+        self.zones: List[str] = [f"Zone{i+1}" for i in range(self.num_zones)] # Use self.num_zones
+
         self.time_frame = duration_minutes
         self.run_context_name = run_context_name
 
@@ -109,7 +120,7 @@ class BuildingSimulationComplex_V2:
             'unresponsive_device_rejections': 0,
             'total_policy_violations_blamed': 0, 
         }
-        self.logger.log_info(self.run_context_name, f"BuildingSimulationComplex_V2 ({self.framework_variant}) | Devices: approx {self.num_devices_approx} | Zones: {num_zones} | Duration: {self.time_frame}m")
+        self.logger.log_info(self.run_context_name, f"BuildingSimulationComplex_V2 ({self.framework_variant}) | Devices: {self.num_devices_approx} | Zones: {self.num_zones} | Primitives/Zone: {self.primitives_per_zone_dist} | Duration: {self.time_frame}m")
     
     def _get_next_job_id(self) -> str:
         self.next_job_id_counter += 1
@@ -124,6 +135,7 @@ class BuildingSimulationComplex_V2:
 
     def _get_random_device_behavior_params(self, num_selfish_rem, num_deceptive_rem, num_policy_violators_rem,
                                            num_faulty_rem, num_unresponsive_rem, is_composite=False) -> Dict:
+        # This method now just returns the parameters; decrementing counters will be handled by the caller
         params = {
             'behavior_profile': "normal",
             'fault_probability': 0.0,
@@ -133,33 +145,44 @@ class BuildingSimulationComplex_V2:
         }
         profile_rand_factor = 0.8 if is_composite else 1.0 
         assigned_profile = False
-        if num_selfish_rem > 0 and random.random() < 0.20 * profile_rand_factor: 
+        
+        # Try to assign a specific misbehavior profile first
+        profile_roll = random.random()
+        if num_selfish_rem > 0 and profile_roll < 0.20 * profile_rand_factor: 
             params['behavior_profile'] = 'selfish'; assigned_profile=True
-        elif not assigned_profile and num_deceptive_rem > 0 and random.random() < 0.20 * profile_rand_factor: 
+        elif not assigned_profile and num_deceptive_rem > 0 and profile_roll < (0.20 + 0.20) * profile_rand_factor: # Cumulative prob
             params['behavior_profile'] = 'deceptive'; assigned_profile=True
-        elif not assigned_profile and num_policy_violators_rem > 0 and random.random() < 0.15 * profile_rand_factor: 
+        elif not assigned_profile and num_policy_violators_rem > 0 and profile_roll < (0.20 + 0.20 + 0.15) * profile_rand_factor: 
             params['behavior_profile'] = 'policy_violator'; assigned_profile=True
         
-        if num_faulty_rem > 0 and random.random() < 0.25: 
+        # Assign independent probabilities for being faulty or unresponsive, can overlap with behavior_profile
+        if num_faulty_rem > 0 and random.random() < 0.25: # 25% of targeted faulty get this
             params['fault_probability'] = random.uniform(0.05, 0.20) 
-        if num_unresponsive_rem > 0 and random.random() < 0.20: 
+        
+        if num_unresponsive_rem > 0 and random.random() < 0.20: # 20% of targeted unresponsive get this
             params['unresponsive_probability'] = random.uniform(0.02, 0.10) 
             params['unresponsive_duration_range'] = (random.randint(3,8), random.randint(10,20))
-        if params['behavior_profile'] == 'deceptive':
+
+        if params['behavior_profile'] == 'deceptive': # This only sets deception_factor if profile is deceptive
             params['deception_factor'] = random.uniform(0.4, 0.7) 
+            
         return params
 
     def setup_devices(self):
         dev_id_counter = 0
         base_starting_balance = 1000
         min_income_per_period = self.metrics.get('min_income_check_interval', 60) * 0.5
-        estimated_total_devices = self.num_devices_approx 
-        s_rem = int(estimated_total_devices * 0.10) 
-        d_rem = int(estimated_total_devices * 0.10) 
-        pv_rem = int(estimated_total_devices * 0.05)
-        f_rem = int(estimated_total_devices * 0.15) 
-        u_rem = int(estimated_total_devices * 0.10) 
+        
+        # Target counts for misbehaving devices
+        # These are targets; actual assignment depends on random rolls within _get_random_device_behavior_params
+        # and how many devices are created.
+        s_rem = int(self.num_devices_approx * 0.10) 
+        d_rem = int(self.num_devices_approx * 0.10) 
+        pv_rem = int(self.num_devices_approx * 0.05)
+        f_rem = int(self.num_devices_approx * 0.15) 
+        u_rem = int(self.num_devices_approx * 0.10) 
 
+        # Create BMS
         bms_id = f"bldg_cplx2_bms_{dev_id_counter}"; dev_id_counter+=1
         bms_behavior_params = self._get_random_device_behavior_params(s_rem, d_rem, pv_rem, f_rem, u_rem, is_composite=True)
         if bms_behavior_params['behavior_profile']=='selfish': s_rem=max(0,s_rem-1)
@@ -178,15 +201,17 @@ class BuildingSimulationComplex_V2:
         self.devices.append(self.bms)
         self.logger.log_info(self.run_context_name, f"Created {self.bms.nameShort()} with profile: {self.bms.behavior_profile}, fault_prob: {self.bms.fault_probability:.2f}, unresp_prob: {self.bms.unresponsive_probability:.2f}")
 
+        # Create Zone Controllers and Devices per Zone
         for zone_idx, zone_name in enumerate(self.zones):
             zc_id = f"bldg_cplx2_zc{zone_idx+1}_{dev_id_counter}"; dev_id_counter+=1
             zc_behavior_params = self._get_random_device_behavior_params(s_rem, d_rem, pv_rem, f_rem, u_rem, is_composite=True)
             if zc_behavior_params['behavior_profile']=='selfish': s_rem=max(0,s_rem-1)
+            # ... (decrement other counters similarly for ZC) ...
             if zc_behavior_params['behavior_profile']=='deceptive': d_rem=max(0,d_rem-1)
             if zc_behavior_params['behavior_profile']=='policy_violator': pv_rem=max(0,pv_rem-1)
             if zc_behavior_params['fault_probability']>0: f_rem=max(0,f_rem-1)
             if zc_behavior_params['unresponsive_probability']>0: u_rem=max(0,u_rem-1)
-            
+
             zone_controller = CompositeDevice(zc_id, f"ZoneCtrl_CplxV2_{zone_name}", max_load=250, 
                                               capabilities=["manage_hvac", "manage_lighting", "zone_security_local", "delegate_zone_tasks", "access_control_zone"],
                                               framework_variant=self.framework_variant, logger_instance=self.logger, current_minute_provider=lambda: self.current_minute,
@@ -197,22 +222,27 @@ class BuildingSimulationComplex_V2:
             zone_controller.sim_metrics_ref = self.metrics
             self.devices.append(zone_controller)
             self.zone_controllers[zone_name] = zone_controller
-            self.logger.log_info(self.run_context_name, f"Created {zone_controller.nameShort()} with profile: {zone_controller.behavior_profile}, fault_prob: {zone_controller.fault_probability:.2f}, unresp_prob: {zone_controller.unresponsive_probability:.2f}")
+            self.logger.log_info(self.run_context_name, f"Created {zone_controller.nameShort()} for {zone_name} with profile: {zone_controller.behavior_profile}, fault_prob: {zone_controller.fault_probability:.2f}, unresp_prob: {zone_controller.unresponsive_probability:.2f}")
 
             if self.framework_variant in ["social_basic", "full_siot"] and self.bms:
                 self.bms.add_worker(zone_controller, constraints={'role': 'zone_management', 'zone': zone_name})
 
-            num_primitives_this_zone = random.randint(max(1, self.devices_per_zone_avg -1), self.devices_per_zone_avg + 1)
+            # Use the specific number of primitives for this zone from the distribution list
+            num_primitives_this_zone = self.primitives_per_zone_dist[zone_idx]
+            
+            self.logger.log_info(self.run_context_name, f"Zone {zone_name} creating {num_primitives_this_zone} primitive devices.")
+
             for i in range(num_primitives_this_zone):
                 dev_id = f"bldg_cplx2_d{dev_id_counter}_{zone_name[:2].lower()}{i}"; dev_id_counter+=1
                 primitive_behavior_params = self._get_random_device_behavior_params(s_rem, d_rem, pv_rem, f_rem, u_rem)
                 if primitive_behavior_params['behavior_profile']=='selfish': s_rem=max(0,s_rem-1)
+                # ... (decrement other counters similarly for primitives) ...
                 if primitive_behavior_params['behavior_profile']=='deceptive': d_rem=max(0,d_rem-1)
                 if primitive_behavior_params['behavior_profile']=='policy_violator': pv_rem=max(0,pv_rem-1)
                 if primitive_behavior_params['fault_probability']>0: f_rem=max(0,f_rem-1)
                 if primitive_behavior_params['unresponsive_probability']>0: u_rem=max(0,u_rem-1)
                 
-                dev_type_roll = random.random()
+                dev_type_roll = random.random() # This roll is now deterministic per device slot due to master seed
                 primitive_device: Optional[Device] = None
                 common_args_init = {'framework_variant': self.framework_variant, 
                                 'logger_instance': self.logger, 
@@ -237,9 +267,11 @@ class BuildingSimulationComplex_V2:
                     self.devices.append(primitive_device)
                     if self.framework_variant in ["social_basic", "full_siot"]:
                         zone_controller.add_worker(primitive_device, constraints={'role': f'{primitive_device.__class__.__name__}_in_{zone_name}'})
+        
         actual_device_count = len(self.devices)
         self.metrics['device_cycles_working'] = {dev.device_id: 0 for dev in self.devices}
         self.metrics['device_cycles_idle'] = {dev.device_id: 0 for dev in self.devices}
+        # Relationship setup (same as before, but now devices have behaviors)
         if self.framework_variant in ["social_basic", "full_siot"]:
             all_composites = ([self.bms] if self.bms else []) + list(self.zone_controllers.values())
             for i_comp in range(len(all_composites)):
@@ -248,7 +280,7 @@ class BuildingSimulationComplex_V2:
                         all_composites[i_comp].add_relationship('work_with_me', all_composites[j_comp])
                         all_composites[j_comp].add_relationship('work_with_me', all_composites[i_comp])
             for dev in self.devices:
-                if isinstance(dev, (SensingDevice, ActuatingDevice)) and random.random() < 0.4:
+                if isinstance(dev, (SensingDevice, ActuatingDevice)) and random.random() < 0.4: # Chance to form back-me
                     dev_zone = getattr(dev, 'zone', None)
                     if dev_zone:
                         potential_backups = [d for d in self.devices if d != dev and getattr(d, 'zone', None) == dev_zone and type(d) == type(dev) and d.device_id != dev.device_id]
@@ -256,6 +288,7 @@ class BuildingSimulationComplex_V2:
                             backup_dev = random.choice(potential_backups)
                             dev.add_relationship('back_me', backup_dev)
         self.logger.log_info(self.run_context_name, f"Total devices for ComplexV2 Sim: {actual_device_count}. Framework: {self.framework_variant}")
+
 
     def _generate_jobs(self):
         # ... (Same as BuildingSimulationComplex) ...
@@ -292,8 +325,8 @@ class BuildingSimulationComplex_V2:
 
         if self.current_minute > 0 and self.current_minute % (self.time_frame // 5) == 0 and random.random() < 0.75: 
             influx_zone = random.choice(self.zones)
-            num_influx = random.randint(int(max(3,self.devices_per_zone_avg) * self.sudden_workload_multiplier),
-                                        int(max(4,self.devices_per_zone_avg * 2) * self.sudden_workload_multiplier))
+            num_influx = random.randint(int(max(3,sum(self.primitives_per_zone_dist)/self.num_zones if self.num_zones > 0 else 3) * self.sudden_workload_multiplier),
+                                        int(max(4,sum(self.primitives_per_zone_dist)/self.num_zones if self.num_zones > 0 else 4) * 2 * self.sudden_workload_multiplier))
             self.logger.log_info(self.run_context_name, f"SUDDEN INFLUX of {num_influx} access requests for {influx_zone}")
             for i in range(num_influx):
                 job = BuildingJob(self._get_next_job_id(), self.current_minute, "ACCESS_REQUEST", influx_zone,
@@ -605,7 +638,6 @@ class BuildingSimulationComplex_V2:
         report_context = f"BldgCplxV2Report_{self.framework_variant}"
         self.logger.log_info(report_context, "\n" + "="*25 + f" BUILDING SIMULATION COMPLEX V2 FINAL REPORT ({self.framework_variant}) " + "="*25)
         
-        # Ensure total_policy_violations_blamed is calculated
         self.metrics['total_policy_violations_blamed'] = sum(d.blame_count for d in self.devices if hasattr(d, 'blame_count'))
 
         total_completed = self.metrics['jobs_completed_on_time'] + self.metrics['jobs_completed_late']
@@ -621,13 +653,13 @@ class BuildingSimulationComplex_V2:
         self.metrics['final_total_balance_network'] = sum(d.balance for d in self.devices if hasattr(d, 'balance'))
         self.metrics['total_income_generated_network'] = sum(d.total_income_earned for d in self.devices if hasattr(d, 'total_income_earned'))
         avg_trust_val_report = "N/A"
-        if self.framework_variant in ["social_basic", "full_siot"] and self.devices:
+        if self.framework_variant == "full_siot" and self.devices:
             trust_scores = [d.trust_score for d in self.devices if hasattr(d, 'trust_score')]
             if trust_scores:
                 avg_trust_val_report = sum(trust_scores) / len(trust_scores)
                 self.metrics['avg_trust_at_end'] = avg_trust_val_report
             else: self.metrics['avg_trust_at_end'] = "N/A (No scores)"
-        else: self.metrics['avg_trust_at_end'] = "N/A (Baseline)"
+        else: self.metrics['avg_trust_at_end'] = "N/A (Not Full SIoT)"
         avg_trust_display = f"{self.metrics['avg_trust_at_end']:.2f}" if isinstance(self.metrics['avg_trust_at_end'], float) else str(self.metrics['avg_trust_at_end'])
         summary_report_lines = [
             f"Framework Variant: {self.framework_variant}",
@@ -645,19 +677,15 @@ class BuildingSimulationComplex_V2:
             f"Total Rewards Earned by Devices (from jobs): {self.metrics['total_rewards_earned']:.0f}",
             f"Total Penalties Incurred by Devices (from jobs): {self.metrics['total_penalties_incurred']:.0f}",
             f"Final Total Network Balance: {self.metrics['final_total_balance_network']:.0f}",
-            f"Average Final Trust (Social Modes only): {avg_trust_display}",
-            "--- SIoT & Behavior Metrics ---", 
-            f"Delegations to Zone Controllers (by BMS): {self.metrics['delegation_to_zone_controller_count']}",
-            f"Delegations to Primitives (by ZC/BMS): {self.metrics['delegation_to_primitive_count']}",
-            f"Successful Back-me Invocations: {self.metrics['back_me_invocations_successful']}",
+            f"Average Final Trust (Full SIoT only): {avg_trust_display}",
+            "--- SIoT & Behavior Metrics ---",
+            f"Delegations to Zone Controllers (by BMS): {self.metrics.get('delegation_to_zone_controller_count', 0)}",
+            f"Delegations to Primitives (by ZC/BMS): {self.metrics.get('delegation_to_primitive_count', 0)}",
+            f"Successful Back-me Invocations: {self.metrics.get('back_me_invocations_successful', 0)}",
             f"Failed Back-me Invocations: {self.metrics.get('back_me_invocations_failed', 0)}",
-            f"Successful Negotiations (Full SIoT): {self.metrics['successful_negotiations']}",
-            f"Failed Negotiations (Full SIoT): {self.metrics['failed_negotiations']}",
-            f"Misuse Incidents Detected (Full SIoT): {self.metrics['misuse_incidents_detected']}",
-            f"Selfish Rejections: {self.metrics.get('selfish_rejections',0)}", 
-            f"Faulty Device Actions Failed: {self.metrics.get('faulty_device_actions_failed',0)}",
-            f"Unresponsive Device Rejections: {self.metrics.get('unresponsive_device_rejections',0)}",
-            f"Total Policy Violations Blamed: {self.metrics.get('total_policy_violations_blamed',0)}"
+            f"Successful Negotiations (Full SIoT): {self.metrics.get('successful_negotiations', 0)}",
+            f"Failed Negotiations (Full SIoT): {self.metrics.get('failed_negotiations', 0)}",
+            f"Misuse Incidents Detected (Full SIoT): {self.metrics.get('misuse_incidents_detected', 0)}"
         ]
         self.logger.log_info(report_context, "\n".join(summary_report_lines))
         self.logger.store_simulation_metrics(
