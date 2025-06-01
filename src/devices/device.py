@@ -593,3 +593,26 @@ class Device:
                 trust_str = "N/A"
             self.log_debug(f"Selected worker {selected_worker.nameShort()} (Trust: {trust_str}, Load: {selected_worker.current_load}) for '{task_description}'.")
             return selected_worker
+
+    def _generate_temperature_reading(self, zone_id: str, timestamp: int) -> float:
+        """Generate a realistic temperature reading based on time and conditions."""
+        zone = next(z for z in self.zones if z.zone_id == zone_id)
+        base_temp = zone.base_temperature
+
+        # Peak at noon, lowest at midnight
+        hour = (timestamp // 60) % 24
+        time_variation = self.environmental_config.temperature_variation_per_hour * (hour - 12) / 12
+
+        # Add random variation
+        random_variation = random.uniform(-0.5, 0.5)
+
+        # Check for window open events affecting temperature
+        window_effect = 0
+        for event in self.generated_events:
+            if (event["type"] == "window_opened" and 
+                event["zone_id"] == zone_id and 
+                timestamp - event["timestamp"] < event["duration_minutes"]):
+                window_effect = self.environmental_config.window_effect_on_temperature
+                break
+
+        return base_temp + time_variation + random_variation + window_effect

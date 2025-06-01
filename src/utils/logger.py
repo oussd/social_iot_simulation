@@ -88,56 +88,75 @@ class SimulationLogger:
 
     def log_comparison(self, simulation_type_for_comparison_key: str, variant_keys_in_order: List[str]):
         self.log_info("COMPARISON_START", f"Attempting comparison for base key: {simulation_type_for_comparison_key}", context_override=self.overall_simulation_name)
-        full_run_keys = [f"{simulation_type_for_comparison_key.lower()}_{vk}" for vk in variant_keys_in_order]
+        
+        # Construct the full run keys in the correct format
+        full_run_keys = [f"{simulation_type_for_comparison_key}_{vk}" for vk in variant_keys_in_order]
         available_metrics_data: Dict[str, Dict[str, Any]] = {}
         all_keys_present = True
+        
         for key_to_check in full_run_keys:
             if key_to_check in self.simulation_metrics_storage:
                 available_metrics_data[key_to_check] = self.simulation_metrics_storage[key_to_check]
             else:
                 self.log_warning("COMPARISON_DATA_MISSING", f"Metrics data missing for run key: {key_to_check}", context_override=self.overall_simulation_name)
                 all_keys_present = False
+        
         if not all_keys_present or not available_metrics_data:
             self.log_error("COMPARISON_FAIL", f"Cannot perform comparison for {simulation_type_for_comparison_key}. Insufficient data. Available stored keys: {list(self.simulation_metrics_storage.keys())}", context_override=self.overall_simulation_name)
             return
 
-        header_parts = [f"{'Metric':<38}"] # Increased width for longer metric names
+        # Format the comparison table header
+        header_parts = [f"{'Metric':<38}"]
         for run_key_header in full_run_keys:
-            variant_name_for_header = run_key_header.replace(f"{simulation_type_for_comparison_key.lower()}_", "").replace("_", " ").title()
+            variant_name_for_header = run_key_header.split('_')[-1].replace("_", " ").title()
             header_parts.append(f"{variant_name_for_header:<25}")
 
-        comparison_lines = ["\n" + "="*30 + f" {simulation_type_for_comparison_key.upper()} FRAMEWORK COMPARISON " + "="*30, "|".join(header_parts), "-" * (38 + len(full_run_keys) * 26)]
-
-        metrics_to_display = [
-            'jobs_completed_on_time', 'jobs_completed_late', 'jobs_failed_deadline', 'jobs_failed_internal',
-            'total_rewards_earned', 'total_penalties_incurred',
-            'avg_job_completion_time', 'avg_job_tardiness',
-            'avg_trust_at_end',
-            'final_total_balance_network',
-            'delegation_to_zone_controller_count', 'delegation_to_primitive_count',
-            'successful_negotiations', 'failed_negotiations',
-            'back_me_invocations_successful', 'back_me_invocations_failed', # Added failed backups
-            # --- New/Enhanced Misuse Metrics ---
-            'misuse_incidents_detected', # Existing: formal incidents flagged
-            'selfish_rejections',        # New: Count of selfish rejections
-            'faulty_device_actions_failed', # New: Count of actions failing due to fault_probability
-            'unresponsive_device_rejections', # New: Count of rejections due to unresponsiveness
-            'total_policy_violations_blamed', # New: Sum of device.blame_count
-            # --- Work Distribution Metrics (Example) ---
-            # 'work_distribution_std_dev_cycles',
-            # 'final_load_distribution_std_dev',
-            # 'overload_rejections',
+        comparison_lines = [
+            "\n" + "="*30 + f" {simulation_type_for_comparison_key.upper()} FRAMEWORK COMPARISON " + "="*30,
+            "|".join(header_parts),
+            "-" * (38 + len(full_run_keys) * 26)
         ]
 
+        # Define the metrics to display in order
+        metrics_to_display = [
+            'total_jobs_created',
+            'total_jobs_done',
+            'jobs_completed_on_time',
+            'jobs_completed_late',
+            'jobs_failed_deadline',
+            'jobs_failed_internal',
+            'total_rewards_earned',
+            'total_penalties_incurred',
+            'avg_job_completion_time',
+            'avg_job_tardiness',
+            'avg_trust_at_end',
+            'final_total_balance_network',
+            'delegation_to_zone_controller_count',
+            'delegation_to_primitive_count',
+            'successful_negotiations',
+            'failed_negotiations',
+            'back_me_invocations_successful',
+            'back_me_invocations_failed',
+            'misuse_incidents_detected',
+            'selfish_rejections',
+            'faulty_device_actions_failed',
+            'unresponsive_device_rejections',
+            'total_policy_violations_blamed'
+        ]
+
+        # Generate the comparison table rows
         for metric_key_display in metrics_to_display:
-            line_parts = [f"{metric_key_display:<38}"] # Adjusted width
+            line_parts = [f"{metric_key_display:<38}"]
             for run_key_data in full_run_keys:
-                val = available_metrics_data.get(run_key_data, {}).get(metric_key_display) # Use .get for safety
+                val = available_metrics_data.get(run_key_data, {}).get(metric_key_display)
                 val_str = "N/A"
                 if val is not None:
-                    if isinstance(val, float): val_str = f"{val:.2f}"
-                    elif isinstance(val, int): val_str = str(val)
-                    elif isinstance(val, str): val_str = val
+                    if isinstance(val, float):
+                        val_str = f"{val:.2f}"
+                    elif isinstance(val, int):
+                        val_str = str(val)
+                    elif isinstance(val, str):
+                        val_str = val
                 line_parts.append(f"{val_str:<25}")
             comparison_lines.append("|".join(line_parts))
 

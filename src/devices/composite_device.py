@@ -55,7 +55,6 @@ class CompositeDevice(Device):
             effective_load_for_sub_task = int(load_for_sub_task * random.uniform(1.2, 1.5))
             self.log_debug(f"Policy violator {self.nameShort()} attempting to delegate '{task_type}' with inflated load {effective_load_for_sub_task} (actual: {load_for_sub_task})")
 
-
         if self.framework_variant == "baseline":
             self.log_debug(f"Baseline mode: Composite {self.nameShort()} cannot effectively delegate '{task_type}' via social hierarchy.")
             return {'success': False, 'reason': 'baseline_no_delegation_framework',
@@ -71,19 +70,36 @@ class CompositeDevice(Device):
             worker = rel['device']
             worker_capabilities = getattr(worker, 'capabilities', [])
             is_suitable = False
-            if task_type == 'sense' and isinstance(worker, SensingDevice):
-                if required_sub_sensor_type:
-                    if getattr(worker, 'sensor_type', None) == required_sub_sensor_type: is_suitable = True
-                elif 'sense' in worker_capabilities: is_suitable = True
-            elif task_type == 'actuate' and isinstance(worker, ActuatingDevice):
-                if required_sub_actuator_type:
-                    if getattr(worker, 'actuator_type', None) == required_sub_actuator_type: is_suitable = True
-                elif 'actuate' in worker_capabilities: is_suitable = True
-            elif task_type == 'transmit' and isinstance(worker, CommunicatingDevice):
-                is_suitable = True
+
+            # Handle specific task types
+            if task_type == 'sense':
+                if isinstance(worker, SensingDevice):
+                    if required_sub_sensor_type:
+                        if getattr(worker, 'sensor_type', None) == required_sub_sensor_type:
+                            is_suitable = True
+                    else:
+                        is_suitable = True  # Any sensor can handle generic sense tasks
+            elif task_type == 'actuate':
+                if isinstance(worker, ActuatingDevice):
+                    if required_sub_actuator_type:
+                        if getattr(worker, 'actuator_type', None) == required_sub_actuator_type:
+                            is_suitable = True
+                    else:
+                        is_suitable = True  # Any actuator can handle generic actuate tasks
+            elif task_type == 'transmit':
+                if isinstance(worker, CommunicatingDevice):
+                    is_suitable = True
+            # Handle composite tasks
+            elif task_type in ['manage_hvac', 'manage_lighting', 'zone_security_local', 'delegate_zone_tasks', 'access_control_zone']:
+                if isinstance(worker, CompositeDevice):
+                    if task_type in worker.capabilities:
+                        is_suitable = True
+            # Handle generic capabilities
             elif task_type in worker_capabilities:
                 is_suitable = True
-            if is_suitable: capable_workers.append(worker)
+
+            if is_suitable:
+                capable_workers.append(worker)
 
         if not capable_workers:
             self.log_warning(f"No capable workers found for task '{task_type}' (specific type: {required_sub_sensor_type or required_sub_actuator_type or 'N/A'}).")
