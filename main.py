@@ -1,14 +1,21 @@
 import os
+import argparse
 from src.simulations.building_scenario_config import save_scenario_to_json
 from src.run_scenario_simulation import create_sample_scenario, run_simulation
 
 
 def main():
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Run building simulation with specified duration.')
+    parser.add_argument('--duration', type=int, default=1440,
+                      help='Simulation duration in minutes (default: 1440)')
+    args = parser.parse_args()
+
     # Create output directory if it doesn't exist
     os.makedirs("output", exist_ok=True)
 
-    # Generate scenario
-    scenario = create_sample_scenario()
+    # Generate scenario with specified duration
+    scenario = create_sample_scenario(duration_minutes=args.duration)
 
     # Save scenario to file
     scenario_file = save_scenario_to_json(scenario, "output/building_scenario")

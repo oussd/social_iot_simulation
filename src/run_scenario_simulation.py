@@ -10,11 +10,11 @@ from src.simulations.building_simulation import BuildingSimulation
 from src.utils.logger import SimulationLogger
 
 
-def create_sample_scenario() -> BuildingScenario:
+def create_sample_scenario(duration_minutes: int = 1440) -> BuildingScenario:
     """Create a sample building scenario for testing."""
     # Time parameters
     time_params = TimeParameters(
-        simulation_duration_minutes=1440,  # 24 hours
+        simulation_duration_minutes=duration_minutes,
         working_hours_start=time(8, 0),    # 8 AM
         working_hours_end=time(18, 0),     # 6 PM
         time_zone="UTC"
@@ -51,47 +51,58 @@ def create_sample_scenario() -> BuildingScenario:
     ]
     
     # Devices
-    devices = []
-    for zone in zones:
-        # Add temperature sensors
-        devices.append(DeviceConfig(
-            device_id=f"temp_sensor_{zone.zone_id}",
+    devices = [
+        DeviceConfig(
+            device_id="temp_sensor_1",
             device_type="temperature_sensor",
-            zone_id=zone.zone_id,
+            zone_id="office_1",
             update_interval_minutes=5,
             capabilities=["temperature_reading"]
-        ))
-        
-        # Add HVAC controls
-        devices.append(DeviceConfig(
-            device_id=f"hvac_{zone.zone_id}",
+        ),
+        DeviceConfig(
+            device_id="temp_sensor_2",
+            device_type="temperature_sensor",
+            zone_id="meeting_1",
+            update_interval_minutes=5,
+            capabilities=["temperature_reading"]
+        ),
+        DeviceConfig(
+            device_id="hvac_1",
             device_type="hvac_control",
-            zone_id=zone.zone_id,
+            zone_id="office_1",
             update_interval_minutes=1,
             capabilities=["temperature_control", "ventilation_control"]
-        ))
+        ),
+        DeviceConfig(
+            device_id="hvac_2",
+            device_type="hvac_control",
+            zone_id="meeting_1",
+            update_interval_minutes=1,
+            capabilities=["temperature_control", "ventilation_control"]
+        )
+    ]
     
-    # Environmental configuration
+    # Environmental config
     env_config = EnvironmentalConfig(
-        base_temperature_range=(18.0, 26.0),
+        base_temperature_range=(20.0, 24.0),  # Comfortable temperature range
         weather_conditions=[
-            {"type": "sunny", "temp_effect": 2.0},
-            {"type": "cloudy", "temp_effect": 0.0},
-            {"type": "rainy", "temp_effect": -1.0}
+            {"type": "sunny", "temperature_effect": 2.0},
+            {"type": "cloudy", "temperature_effect": 0.0},
+            {"type": "rainy", "temperature_effect": -1.0}
         ],
-        temperature_variation_per_hour=1.5,
-        window_effect_on_temperature=-2.0
+        temperature_variation_per_hour=1.0,  # Temperature varies by 1°C per hour
+        window_effect_on_temperature=3.0  # Windows being open affects temperature by 3°C
     )
     
     # Event probabilities
     event_probs = EventProbabilities(
-        window_open_probability=0.01,      # 1% chance per minute
-        access_event_probability=0.05,     # 5% chance per minute during working hours
-        emergency_event_probability=0.001,  # 0.1% chance per minute
-        device_failure_probability=0.0001  # 0.01% chance per minute
+        window_open_probability=0.1,
+        access_event_probability=0.2,
+        emergency_event_probability=0.05,
+        device_failure_probability=0.02
     )
     
-    # Generate the scenario
+    # Create scenario generator
     generator = BuildingScenarioGenerator(
         time_parameters=time_params,
         zones=zones,

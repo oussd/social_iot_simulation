@@ -72,6 +72,7 @@ class BuildingSimulation:
         self.zones: List[str] = [zone.zone_id for zone in scenario.zones]
         self.active_jobs: Dict[str, BuildingJob] = {}
         self.processed_jobs: List[BuildingJob] = []
+        self.job_queue: List[BuildingJob] = []  # Initialize job queue
 
         # Initialize metrics
         self.metrics: Dict[str, Any] = {
@@ -109,7 +110,7 @@ class BuildingSimulation:
     def _create_device(self, config: DeviceConfig) -> Optional[Device]:
         """Create a device based on its configuration."""
         if config.device_type == "temperature_sensor":
-            return SensingDevice(
+            device = SensingDevice(
                 device_id=config.device_id,
                 name=f"TempSens_{config.zone_id}",
                 max_load=50,
@@ -118,8 +119,10 @@ class BuildingSimulation:
                 logger_instance=self.logger,
                 current_minute_provider=lambda: self.current_minute
             )
+            device.zone = config.zone_id  # Set the zone attribute
+            return device
         elif config.device_type == "hvac_control":
-            return ActuatingDevice(
+            device = ActuatingDevice(
                 device_id=config.device_id,
                 name=f"HVAC_{config.zone_id}",
                 max_load=100,
@@ -128,6 +131,8 @@ class BuildingSimulation:
                 logger_instance=self.logger,
                 current_minute_provider=lambda: self.current_minute
             )
+            device.zone = config.zone_id  # Set the zone attribute
+            return device
         # Add more device types as needed
         return None
 
@@ -171,8 +176,12 @@ class BuildingSimulation:
         """Generate jobs based on temperature readings and conditions."""
         for device in self.devices:
             if isinstance(device, SensingDevice) and device.sensor_type == "temperature":
-                # Get current temperature reading
-                current_temp = device.get_last_reading()
+                # Get current temperature reading using handle_request
+                result = device.handle_request(None, "sense", 5, {"sensor_type": "temperature"})
+                if not result.get('success'):
+                    continue
+                
+                current_temp = result.get('value')
                 if current_temp is None:
                     continue
                 
@@ -593,6 +602,23 @@ class BuildingSimulation:
             if job.id in self.active_jobs: del self.active_jobs[job.id]
             setattr(device, 'current_job_id', None)
 
+    def _process_active_jobs(self):
+        """Process all active jobs in the simulation."""
+        # Create a copy of active jobs to avoid modification during iteration
+        active_jobs = list(self.active_jobs.values())
+        
+        for job in active_jobs:
+            device = self._get_device_by_id(job.assigned_to_device_id)
+            if device:
+                self._process_device_job(device, job)
+            else:
+                self.logger.log_warning(self.run_context_name, f"Job {job.id} assigned to non-existent device {job.assigned_to_device_id}")
+                job.status = "FAILED_INTERNAL"
+                self.metrics['jobs_failed_internal'] += 1
+                self.metrics['total_jobs_done'] += 1
+                if job.id in self.active_jobs:
+                    del self.active_jobs[job.id]
+
     def run(self):
         self.logger.log_info(
             "BldgCplxV3Run",
@@ -605,78 +631,58 @@ class BuildingSimulation:
             self.simulate_cycle(minute_cycle)
             if minute_cycle > 0 and (minute_cycle % (self.time_frame // 20 if self.time_frame >=20 else 1) == 0 or minute_cycle == self.time_frame -1) :
                  failed_total = self.metrics['jobs_failed_deadline'] + self.metrics['jobs_failed_internal']
-                 self.logger.log_info(self.run_context_name, f"Min {minute_cycle} | Jobs (Queue/Act/Fail): {len(self.job_queue)}/{len(self.active_jobs)}/{failed_total} | Comp(OK/Late):{self.metrics['jobs_completed_on_time']}/{self.metrics['jobs_completed_late']}")
+                 self.logger.log_info(self.run_context_name, f"Min {minute_cycle} | Active/Failed Jobs: {len(self.active_jobs)}/{failed_total} | Completed(OK/Late):{self.metrics['jobs_completed_on_time']}/{self.metrics['jobs_completed_late']}")
         
         self.report()
 
     def report(self):
-        report_context = f"BldgCplxV3Report_{self.framework_variant}" 
-        self.logger.log_info(report_context, "\n" + "="*25 + f" BUILDING SIMULATION COMPLEX V3 FINAL REPORT ({self.framework_variant}) " + "="*25)
+        """Generate a final report of the simulation."""
+        print("\n" + "=" * 80)
+        print(f"========================= BUILDING SIMULATION COMPLEX V3 FINAL REPORT ({self.framework_variant}) ==========================")
+        print("=" * 80)
         
-        self.metrics['total_policy_violations_blamed'] = sum(d.blame_count for d in self.devices if hasattr(d, 'blame_count'))
+        # Basic stats
+        print(f"Duration: {self.time_frame}m | Devices: {len(self.devices)} | Zones: {len(self.zones)}")
+        print(f"Total Jobs Created: {self.metrics['total_jobs_created']}")
+        print(f"Total Jobs Completed: {self.metrics['total_jobs_done']}")
+        print(f"Jobs Completed On Time: {self.metrics['jobs_completed_on_time']}")
+        print(f"Jobs Completed Late: {self.metrics['jobs_completed_late']}")
+        print(f"Jobs Failed (Deadline): {self.metrics['jobs_failed_deadline']}")
+        print(f"Jobs Failed (Internal): {self.metrics['jobs_failed_internal']}")
         
-        # Calculate total jobs
-        self.metrics['total_jobs'] = (
-            self.metrics.get('jobs_completed_on_time', 0) +
-            self.metrics.get('jobs_completed_late', 0) +
-            self.metrics.get('jobs_failed_deadline', 0) +
-            self.metrics.get('jobs_failed_internal', 0)
-        )
-
-        total_completed = self.metrics['jobs_completed_on_time'] + self.metrics['jobs_completed_late']
-        if total_completed > 0:
-            completion_times = [job.completion_time - job.creation_time for job in self.processed_jobs if job.status.startswith("COMPLETED") and job.completion_time != -1 and hasattr(job, 'creation_time') and job.creation_time != -1]
-            self.metrics['avg_job_completion_time'] = sum(completion_times) / len(completion_times) if completion_times else 0.0
-            late_jobs = [job for job in self.processed_jobs if job.status == "COMPLETED_LATE" and job.completion_time != -1 and hasattr(job, 'deadline_time') and job.deadline_time != -1]
-            tardiness_values = [job.completion_time - job.deadline_time for job in late_jobs if job.completion_time > job.deadline_time] 
-            self.metrics['avg_job_tardiness'] = sum(tardiness_values) / len(tardiness_values) if tardiness_values else 0.0
-        else:
-            self.metrics['avg_job_completion_time'] = 0.0
-            self.metrics['avg_job_tardiness'] = 0.0
-        self.metrics['final_total_balance_network'] = sum(d.balance for d in self.devices if hasattr(d, 'balance'))
-        self.metrics['total_income_generated_network'] = sum(d.total_income_earned for d in self.devices if hasattr(d, 'total_income_earned'))
-        avg_trust_val_report = "N/A"
-        if self.framework_variant == "full_siot" and self.devices:
-            trust_scores = [d.trust_score for d in self.devices if hasattr(d, 'trust_score')]
-            if trust_scores:
-                avg_trust_val_report = sum(trust_scores) / len(trust_scores)
-                self.metrics['avg_trust_at_end'] = avg_trust_val_report
-            else: self.metrics['avg_trust_at_end'] = "N/A (No scores)"
-        else: self.metrics['avg_trust_at_end'] = "N/A (Not Full SIoT)"
-        avg_trust_display = f"{self.metrics['avg_trust_at_end']:.2f}" if isinstance(self.metrics['avg_trust_at_end'], float) else str(self.metrics['avg_trust_at_end'])
-        summary_report_lines = [
-            f"Framework Variant: {self.framework_variant}",
-            f"Duration: {self.time_frame}m | Devices: {len(self.devices)} | Zones: {self.num_zones}",
-            "--- Job Statistics ---",
-            f"Total Jobs Created: {self.metrics['total_jobs_created']}",
-            f"Total Jobs Done: {self.metrics['total_jobs_done']}",
-            f"Jobs Assigned: {self.metrics['jobs_assigned']}",
-            f"Jobs Completed On Time: {self.metrics['jobs_completed_on_time']}",
-            f"Jobs Completed Late: {self.metrics['jobs_completed_late']}",
-            f"Jobs Failed (Deadline or Internal): {self.metrics['jobs_failed_deadline'] + self.metrics['jobs_failed_internal']}",
-            f"Total Work Units Processed: {self.metrics['total_work_units_processed']:.1f}",
-            f"Avg Job Completion Time (for completed): {self.metrics['avg_job_completion_time']:.2f} min",
-            f"Avg Job Tardiness (for late): {self.metrics['avg_job_tardiness']:.2f} min",
-            "--- Device & Network Monetary & Trust ---",
-            f"Total Rewards Earned by Devices (from jobs): {self.metrics['total_rewards_earned']:.0f}",
-            f"Total Penalties Incurred by Devices (from jobs): {self.metrics['total_penalties_incurred']:.0f}",
-            f"Final Total Network Balance: {self.metrics['final_total_balance_network']:.0f}",
-            f"Average Final Trust (Full SIoT only): {avg_trust_display}",
-            "--- SIoT & Behavior Metrics ---",
-            f"Delegations to Zone Controllers (by BMS): {self.metrics.get('delegation_to_zone_controller_count', 0)}",
-            f"Delegations to Primitives (by ZC/BMS): {self.metrics.get('delegation_to_primitive_count', 0)}",
-            f"Successful Back-me Invocations: {self.metrics.get('back_me_invocations_successful', 0)}",
-            f"Failed Back-me Invocations: {self.metrics.get('back_me_invocations_failed', 0)}",
-            f"Successful Negotiations (Full SIoT): {self.metrics.get('successful_negotiations', 0)}",
-            f"Failed Negotiations (Full SIoT): {self.metrics.get('failed_negotiations', 0)}",
-            f"Misuse Incidents Detected (Full SIoT): {self.metrics.get('misuse_incidents_detected', 0)}"
-        ]
-        self.logger.log_info("OVERALL_SIM_SUMMARY", "\n".join(summary_report_lines), context_override=report_context)
+        # Performance metrics
+        print("\nPerformance Metrics:")
+        print(f"Total Work Units Processed: {self.metrics['total_work_units_processed']}")
+        print(f"Average Job Completion Time: {self.metrics['avg_job_completion_time']:.2f} minutes")
+        print(f"Average Job Tardiness: {self.metrics['avg_job_tardiness']:.2f} minutes")
+        
+        # Device stats
+        print("\nDevice Statistics:")
+        for device_id, working_cycles in self.metrics['device_cycles_working'].items():
+            idle_cycles = self.metrics['device_cycles_idle'][device_id]
+            total_cycles = working_cycles + idle_cycles
+            utilization = (working_cycles / total_cycles * 100) if total_cycles > 0 else 0
+            print(f"Device {device_id}: {utilization:.1f}% utilization ({working_cycles}/{total_cycles} cycles)")
+        
+        # Economic metrics
+        print("\nEconomic Metrics:")
+        print(f"Total Rewards Earned: {self.metrics['total_rewards_earned']}")
+        print(f"Total Penalties Incurred: {self.metrics['total_penalties_incurred']}")
+        print(f"Net Balance: {self.metrics['total_rewards_earned'] - self.metrics['total_penalties_incurred']}")
+        
+        # Trust and QoE metrics
+        print("\nTrust and QoE Metrics:")
+        print(f"Average Trust at End: {self.metrics['avg_trust_at_end']}")
+        if self.metrics['qoe_interaction_samples']:
+            avg_qoe = sum(self.metrics['qoe_interaction_samples']) / len(self.metrics['qoe_interaction_samples'])
+            print(f"Average QoE: {avg_qoe:.2f}")
+        
+        print("=" * 80)
         
         # Store metrics with the correct run key format
         self.logger.store_simulation_metrics(
             metrics_dict=self.metrics,
             simulation_run_key=self.run_context_name
         )
-        self.logger.log_info("FINAL_REPORT_END", "="*70, context_override=report_context)
+        self.logger.log_info("FINAL_REPORT_END", "="*70, context_override=f"BldgCplxV3Report_{self.framework_variant}")
 

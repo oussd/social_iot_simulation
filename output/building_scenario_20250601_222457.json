@@ -1,0 +1,4760 @@
+{
+  "time_parameters": {
+    "simulation_duration_minutes": 1440,
+    "working_hours_start": "08:00",
+    "working_hours_end": "18:00",
+    "time_zone": "UTC"
+  },
+  "zones": [
+    {
+      "zone_id": "office_1",
+      "zone_type": "office",
+      "size_m2": 100.0,
+      "base_temperature": 22.0,
+      "occupancy_pattern": {
+        "8": 0.8,
+        "9": 0.9,
+        "12": 0.3,
+        "13": 0.8,
+        "17": 0.6,
+        "18": 0.1
+      }
+    },
+    {
+      "zone_id": "meeting_1",
+      "zone_type": "meeting_room",
+      "size_m2": 50.0,
+      "base_temperature": 21.0,
+      "occupancy_pattern": {
+        "9": 0.7,
+        "12": 0.1,
+        "14": 0.8,
+        "17": 0.3
+      }
+    }
+  ],
+  "devices": [
+    {
+      "device_id": "temp_sensor_office_1",
+      "device_type": "temperature_sensor",
+      "zone_id": "office_1",
+      "update_interval_minutes": 5,
+      "capabilities": [
+        "temperature_reading"
+      ]
+    },
+    {
+      "device_id": "hvac_office_1",
+      "device_type": "hvac_control",
+      "zone_id": "office_1",
+      "update_interval_minutes": 1,
+      "capabilities": [
+        "temperature_control",
+        "ventilation_control"
+      ]
+    },
+    {
+      "device_id": "temp_sensor_meeting_1",
+      "device_type": "temperature_sensor",
+      "zone_id": "meeting_1",
+      "update_interval_minutes": 5,
+      "capabilities": [
+        "temperature_reading"
+      ]
+    },
+    {
+      "device_id": "hvac_meeting_1",
+      "device_type": "hvac_control",
+      "zone_id": "meeting_1",
+      "update_interval_minutes": 1,
+      "capabilities": [
+        "temperature_control",
+        "ventilation_control"
+      ]
+    }
+  ],
+  "environmental_config": {
+    "base_temperature_range": [
+      18.0,
+      26.0
+    ],
+    "weather_conditions": [
+      {
+        "type": "sunny",
+        "temp_effect": 2.0
+      },
+      {
+        "type": "cloudy",
+        "temp_effect": 0.0
+      },
+      {
+        "type": "rainy",
+        "temp_effect": -1.0
+      }
+    ],
+    "temperature_variation_per_hour": 1.5,
+    "window_effect_on_temperature": -2.0
+  },
+  "event_probabilities": {
+    "window_open_probability": 0.01,
+    "access_event_probability": 0.05,
+    "emergency_event_probability": 0.001,
+    "device_failure_probability": 0.0001
+  },
+  "generated_events": [
+    {
+      "type": "temperature_reading",
+      "timestamp": 0,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.296792867829353
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 0,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.032892397198744
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 5,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.427355540546515
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 5,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.516364260808757
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 10,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.454078599360766
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 10,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.957081001134895
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 15,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.627064492097666
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 15,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.1485579407038
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 20,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.757894414615212
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 20,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.31379081334902
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 25,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.540673194110035
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 25,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.411301653125097
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 30,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.606541901346738
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 30,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.11844315031112
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 35,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.1976527048877
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 35,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.696376175886595
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 40,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.979412584016636
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 40,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.7677704460228
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 45,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.3962359206767
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 45,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.56569854132004
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 50,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.84614879286181
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 50,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.56464634536037
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 55,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.167426709043546
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 55,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.137105124188835
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 60,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.57884717982158
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 60,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.657804890525888
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 65,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.08694666907149
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 65,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.759896685642786
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 70,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.072191411323246
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 70,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.988219957253623
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 75,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.176997993453345
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 75,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.082003535796147
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 80,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.904267796301212
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 80,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.270623104299496
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 81,
+      "zone_id": "office_1",
+      "duration_minutes": 26
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 85,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.739981542932735
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 85,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.30613236503098
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 90,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.8543721287239
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 90,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.109126738231677
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 95,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.676318628620912
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 95,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.618209926592687
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 100,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.6670728617502
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 100,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.535987007456566
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 105,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.425896010456345
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 105,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.79504244446143
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 110,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.042605434509444
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 110,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.52371631437538
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 115,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.827739419202636
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 115,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.039826917399846
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 120,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.065450968295277
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 120,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.868286152646956
+    },
+    {
+      "type": "emergency",
+      "timestamp": 122,
+      "zone_id": "meeting_1",
+      "emergency_type": "flood"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 125,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.680566192157325
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 125,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.65841055944564
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 130,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.258764797924023
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 130,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.900112883637316
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 135,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.05540435652829
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 135,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.783455169924682
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 140,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.022562764866336
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 140,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.503426813260624
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 145,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.475776946864436
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 145,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.612088837966148
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 150,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.118862666615165
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 150,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.70848304677693
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 155,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.618490933799457
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 155,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.61890275056107
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 160,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.477128645373405
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 160,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.81059591673219
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 165,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.159218793337704
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 165,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.493073883077937
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 170,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.94730787504971
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 170,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.426223330706673
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 175,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.81280265923502
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 175,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.288551214491303
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 180,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.42913264251943
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 180,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.358892088613935
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 185,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.31845883295466
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 185,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.819553784060474
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 190,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.584173416886024
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 190,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.08484000975784
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 195,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.397534164123613
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 195,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.516056158763117
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 196,
+      "zone_id": "office_1",
+      "duration_minutes": 30
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 200,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.602153807212424
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 200,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.086943749758685
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 205,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.951859968779313
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 205,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.236869118237323
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 210,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.256089791728833
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 210,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.925183245835516
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 215,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.075349539222692
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 215,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.51336609500677
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 220,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.96916107044072
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 220,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.007150644479854
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 225,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.298138226498832
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 225,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.362559627658104
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 230,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.788669995280216
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 230,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.583741971341382
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 235,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.202070388377095
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 235,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.66056659639562
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 240,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.259319591103264
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 240,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.51851886937889
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 245,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.60268695020258
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 245,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.418920980047293
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 250,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.19838363984369
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 250,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.778542372347054
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 255,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.917907721853307
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 255,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.061111519398285
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 260,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.784340522549606
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 260,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.732121959906543
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 265,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.32790145406525
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 265,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.30078661244087
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 270,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.73838707020755
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 270,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.4022022082316
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 275,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.573810546784816
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 275,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.369192971482864
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 280,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.185514017284525
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 280,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.632000516426917
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 285,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.477082740236927
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 285,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.525284468223113
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 290,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.04441237292734
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 290,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.332628385794333
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 295,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.015607860348947
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 295,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.946729241557538
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 300,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.04905570140105
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 300,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.314609880546108
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 305,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.41329511213496
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 305,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.273777004629462
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 307,
+      "zone_id": "meeting_1",
+      "duration_minutes": 6
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 310,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.567959223967204
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 310,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.932848731716504
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 315,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.191597091761047
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 315,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.666635708141946
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 320,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.213409434649037
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 320,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.524986654873363
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 325,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.727095493093604
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 325,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.657056587578037
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 330,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.004706059319847
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 330,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.654625572333558
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 335,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.775642031293167
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 335,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.973549569876308
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 340,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.869620942498617
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 340,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.74597341278376
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 340,
+      "zone_id": "office_1",
+      "duration_minutes": 22
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 341,
+      "zone_id": "meeting_1",
+      "duration_minutes": 16
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 345,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.396082503926458
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 345,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.652843898657476
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 350,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.30951224674696
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 350,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.494313197004413
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 354,
+      "zone_id": "meeting_1",
+      "duration_minutes": 21
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 355,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.844678814570614
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 355,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.97825766572013
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 360,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.351660290150924
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 360,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.019058088358253
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 365,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.284591894625688
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 365,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.78413888333853
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 370,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.741560616638846
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 370,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.454617842422454
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 375,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.198974532805092
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 375,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.48929379239875
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 380,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.065591879454196
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 380,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 19.831944071100157
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 385,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.05988923062552
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 385,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.694594615518927
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 390,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.860295211538144
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 390,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.620072398926332
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 395,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.002001855843847
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 395,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.1465044725338
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 400,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.050778779233962
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 400,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.484173752598863
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 405,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.762258907017
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 405,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.73628776157743
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 410,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.206956859011097
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 410,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.000520837996305
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 415,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.530833957755767
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 415,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.211656630652413
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 420,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.31304152270875
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 420,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.540057691927778
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 425,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.642011550159406
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 425,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.71076781850378
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 430,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.568839265660532
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 430,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.578200496005024
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 435,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 20.979430762538055
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 435,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.308765517471087
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 440,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.650616088014562
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 440,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.547475162943954
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 445,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.642822898352136
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 445,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.03371588889379
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 449,
+      "zone_id": "office_1",
+      "duration_minutes": 17
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 450,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.108466042247056
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 450,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.666350293333302
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 455,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.36227853041012
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 455,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.489105551513852
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 460,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.39221213994546
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 460,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.463832604182805
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 465,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.369559356530186
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 465,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.297387298048136
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 470,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.066407535206803
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 470,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.27523482999289
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 475,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.73556612424319
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 475,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.609763423578322
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 480,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.019827380678205
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 480,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.378583865162884
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 484,
+      "zone_id": "office_1",
+      "user_id": "user_5",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 485,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.410336574239498
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 485,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.03023037097056
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 490,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.443861524060534
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 490,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.02592183184389
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 492,
+      "zone_id": "office_1",
+      "user_id": "user_71",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 495,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.1927969689076
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 495,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.61419373807171
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 500,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.961947934139285
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 500,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.95798210446266
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 500,
+      "zone_id": "meeting_1",
+      "user_id": "user_26",
+      "access_type": "exit"
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 503,
+      "zone_id": "office_1",
+      "user_id": "user_67",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 505,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.196446379245998
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 505,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.30951182346466
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 510,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.439732001455766
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 510,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.20750471188102
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 515,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.78254885941326
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 515,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.519590701583702
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 518,
+      "zone_id": "meeting_1",
+      "user_id": "user_40",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 520,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.120076919391433
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 520,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.252525185636976
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 525,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.254748466157427
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 525,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.85012301247359
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 530,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.943042700436465
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 530,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.416491530533065
+    },
+    {
+      "type": "emergency",
+      "timestamp": 534,
+      "zone_id": "office_1",
+      "emergency_type": "fire"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 535,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.431614797822483
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 535,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.760852318107716
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 540,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.949937283066653
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 540,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.962587275432547
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 545,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.06757115219776
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 545,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.919888803193444
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 550,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.19554198550175
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 550,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.210692091818018
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 550,
+      "zone_id": "office_1",
+      "user_id": "user_29",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 555,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.008683608289303
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 555,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.999943805174198
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 560,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.073874666875565
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 560,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.0557525509563
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 563,
+      "zone_id": "office_1",
+      "user_id": "user_3",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 565,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.188670741054718
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 565,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.418376780824865
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 570,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.074736591578866
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 570,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.747148635549436
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 571,
+      "zone_id": "meeting_1",
+      "user_id": "user_46",
+      "access_type": "exit"
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 572,
+      "zone_id": "meeting_1",
+      "user_id": "user_57",
+      "access_type": "entry"
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 573,
+      "zone_id": "office_1",
+      "user_id": "user_76",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 575,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.587167533619883
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 575,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.582273811444868
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 576,
+      "zone_id": "office_1",
+      "user_id": "user_63",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 580,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.669130096145253
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 580,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.197272922295223
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 585,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.89201711825229
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 585,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.676347047450694
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 590,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.07933020672273
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 590,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.655018066523184
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 595,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.841356044965647
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 595,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.680821456527887
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 600,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.418351344914573
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 600,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.03627928196987
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 605,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.329597641682263
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 605,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.56653414668133
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 605,
+      "zone_id": "meeting_1",
+      "user_id": "user_47",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 610,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.66009222767675
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 610,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.13676251597472
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 614,
+      "zone_id": "office_1",
+      "user_id": "user_1",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 615,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.06609218939436
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 615,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.516619285600516
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 618,
+      "zone_id": "meeting_1",
+      "user_id": "user_37",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 620,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.841237755118797
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 620,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.314352905432
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 625,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.91572493637539
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 625,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.056923676064663
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 630,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.61693683490153
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 630,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.1893346923353
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 635,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.505339883872903
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 635,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.82455131240577
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 640,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.738503979541782
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 640,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.917367388855187
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 641,
+      "zone_id": "office_1",
+      "user_id": "user_91",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 645,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.634479240047316
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 645,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.876100090118218
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 650,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.730430556610262
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 650,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.76471547040706
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 651,
+      "zone_id": "office_1",
+      "user_id": "user_72",
+      "access_type": "entry"
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 654,
+      "zone_id": "meeting_1",
+      "user_id": "user_54",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 655,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.596243739774447
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 655,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.199437390299405
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 655,
+      "zone_id": "meeting_1",
+      "user_id": "user_80",
+      "access_type": "exit"
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 656,
+      "zone_id": "office_1",
+      "user_id": "user_12",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 660,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.38056367444381
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 660,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.598703987805305
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 665,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.17907333996754
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 665,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.621784376359773
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 666,
+      "zone_id": "office_1",
+      "user_id": "user_71",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 670,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.139066737248232
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 670,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.638845157955494
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 671,
+      "zone_id": "office_1",
+      "duration_minutes": 22
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 671,
+      "zone_id": "office_1",
+      "user_id": "user_43",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 675,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.499890638882473
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 675,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.23127727886066
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 680,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.396994139889504
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 680,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.24912512668661
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 681,
+      "zone_id": "meeting_1",
+      "user_id": "user_96",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 685,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.12428276016916
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 685,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.907330789898253
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 687,
+      "zone_id": "meeting_1",
+      "user_id": "user_15",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 690,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.17855417214456
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 690,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.12190350242789
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 695,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.83310035699186
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 695,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.255606799193988
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 695,
+      "zone_id": "office_1",
+      "user_id": "user_18",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 700,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.59979911026949
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 700,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.886622580630256
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 702,
+      "zone_id": "meeting_1",
+      "user_id": "user_23",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 705,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.388138540155875
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 705,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.559253278135042
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 710,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.577023078758746
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 710,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.567229437661837
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 713,
+      "zone_id": "meeting_1",
+      "user_id": "user_35",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 715,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.601941618542465
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 715,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.854018465537415
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 718,
+      "zone_id": "meeting_1",
+      "user_id": "user_53",
+      "access_type": "entry"
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 719,
+      "zone_id": "meeting_1",
+      "user_id": "user_68",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 720,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.553530768390846
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 720,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.682051168771487
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 725,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.24019926486729
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 725,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.63255546257864
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 725,
+      "zone_id": "office_1",
+      "user_id": "user_96",
+      "access_type": "exit"
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 725,
+      "zone_id": "meeting_1",
+      "user_id": "user_100",
+      "access_type": "entry"
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 729,
+      "zone_id": "office_1",
+      "duration_minutes": 13
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 730,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.605112047839572
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 730,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.7098492306016
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 735,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.732200154563724
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 735,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.554903051820403
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 740,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.987153573863445
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 740,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.53773074653118
+    },
+    {
+      "type": "emergency",
+      "timestamp": 742,
+      "zone_id": "office_1",
+      "emergency_type": "intrusion"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 745,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.46927237113304
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 745,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.936162709972436
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 750,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.94760796479334
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 750,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.447172974157258
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 755,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.506967650140172
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 755,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.23283341161572
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 759,
+      "zone_id": "meeting_1",
+      "user_id": "user_36",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 760,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.647600628021937
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 760,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.124023408012516
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 761,
+      "zone_id": "meeting_1",
+      "duration_minutes": 17
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 763,
+      "zone_id": "meeting_1",
+      "user_id": "user_69",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 765,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.770967566946325
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 765,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.750797982971005
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 769,
+      "zone_id": "office_1",
+      "user_id": "user_91",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 770,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.234226716278336
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 770,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.109790163717
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 770,
+      "zone_id": "office_1",
+      "user_id": "user_49",
+      "access_type": "entry"
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 771,
+      "zone_id": "meeting_1",
+      "user_id": "user_13",
+      "access_type": "exit"
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 774,
+      "zone_id": "office_1",
+      "user_id": "user_92",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 775,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.204469810182818
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 775,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.159084781703697
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 775,
+      "zone_id": "meeting_1",
+      "user_id": "user_38",
+      "access_type": "exit"
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 776,
+      "zone_id": "office_1",
+      "duration_minutes": 30
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 780,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.01114439052411
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 780,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.75743926391846
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 785,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.390324694877357
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 785,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.9264520955367
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 788,
+      "zone_id": "office_1",
+      "user_id": "user_37",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 790,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.147041798406576
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 790,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.999332170268737
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 795,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.47893919950924
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 795,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.723180040408472
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 800,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.2913356831445
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 800,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.031864956023256
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 800,
+      "zone_id": "meeting_1",
+      "user_id": "user_98",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 805,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.728269909564
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 805,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.24053888438977
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 807,
+      "zone_id": "meeting_1",
+      "user_id": "user_33",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 810,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.009535809464516
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 810,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.465153062613584
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 810,
+      "zone_id": "office_1",
+      "user_id": "user_93",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 815,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.659377445850158
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 815,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.366777614438213
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 820,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.34979324602032
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 820,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.942115182213985
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 825,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.660986811076807
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 825,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.5440240691102
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 830,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.23591092150382
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 830,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.285385662506997
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 835,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.300741332106387
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 835,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.67517770213153
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 835,
+      "zone_id": "office_1",
+      "user_id": "user_65",
+      "access_type": "exit"
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 836,
+      "zone_id": "meeting_1",
+      "user_id": "user_19",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 840,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.273049061544317
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 840,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.620356417193776
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 845,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.20456120259518
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 845,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.74486007988445
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 850,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.756745346632655
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 850,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.230938924167994
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 854,
+      "zone_id": "office_1",
+      "user_id": "user_59",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 855,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.89700091755233
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 855,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.540543637416548
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 859,
+      "zone_id": "office_1",
+      "user_id": "user_65",
+      "access_type": "exit"
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 859,
+      "zone_id": "meeting_1",
+      "user_id": "user_19",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 860,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.46194723555888
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 860,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.620203034650963
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 865,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.625555499231787
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 865,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.086303304622106
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 869,
+      "zone_id": "office_1",
+      "user_id": "user_89",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 870,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.68115303840579
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 870,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.624661000188304
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 871,
+      "zone_id": "office_1",
+      "user_id": "user_12",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 875,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.954433691057577
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 875,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.080371386568856
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 880,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.767729978530912
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 880,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.00671912943204
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 882,
+      "zone_id": "meeting_1",
+      "user_id": "user_2",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 885,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.79640632846755
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 885,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.537351545577785
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 890,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 21.996774528508546
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 890,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.425704016417814
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 895,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.484950025285606
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 895,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.86328454602906
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 899,
+      "zone_id": "office_1",
+      "user_id": "user_67",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 900,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.682047530301567
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 900,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.331914956770472
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 905,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.470724383355662
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 905,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.163797417738675
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 908,
+      "zone_id": "office_1",
+      "user_id": "user_58",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 910,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.32860824772023
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 910,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.754848300056885
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 915,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.38665280572264
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 915,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.630449332267336
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 920,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.62172381052833
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 920,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.353545754936206
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 923,
+      "zone_id": "office_1",
+      "user_id": "user_90",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 925,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.750222014083004
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 925,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.137561009061926
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 928,
+      "zone_id": "office_1",
+      "user_id": "user_58",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 930,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.282273214266745
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 930,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.023623894910717
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 930,
+      "zone_id": "office_1",
+      "user_id": "user_72",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 935,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.07239955678051
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 935,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.360918058316784
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 939,
+      "zone_id": "meeting_1",
+      "user_id": "user_66",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 940,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.58611139932288
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 940,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.41576762502433
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 945,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.77124270539857
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 945,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.14274030842062
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 950,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.783557022515243
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 950,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 20.87825160688148
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 951,
+      "zone_id": "meeting_1",
+      "user_id": "user_79",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 955,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.58163510950368
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 955,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.428780481594963
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 955,
+      "zone_id": "office_1",
+      "user_id": "user_97",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 960,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.203107511594354
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 960,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.624384613641443
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 962,
+      "zone_id": "office_1",
+      "user_id": "user_89",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 965,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.52968224323138
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 965,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.15602603404571
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 968,
+      "zone_id": "meeting_1",
+      "user_id": "user_94",
+      "access_type": "exit"
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 969,
+      "zone_id": "office_1",
+      "user_id": "user_25",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 970,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.78603055390847
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 970,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.637026383275263
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 972,
+      "zone_id": "office_1",
+      "user_id": "user_17",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 975,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.65799546280807
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 975,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.057082054484283
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 980,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.794554684619154
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 980,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.212605982178417
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 982,
+      "zone_id": "office_1",
+      "user_id": "user_72",
+      "access_type": "entry"
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 984,
+      "zone_id": "office_1",
+      "user_id": "user_27",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 985,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.048236500080236
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 985,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.413763992674507
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 990,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.691097225309818
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 990,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.412253229621765
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 995,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.32570778800059
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 995,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.33965491712522
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 995,
+      "zone_id": "office_1",
+      "user_id": "user_50",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1000,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.695017674308875
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1000,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.95098609902597
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1005,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.670459122630724
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1005,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.668210828468226
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 1006,
+      "zone_id": "meeting_1",
+      "user_id": "user_35",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1010,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.4884046447459
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1010,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.224186539806137
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1015,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.520656688336693
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1015,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.192442795710893
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1020,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.64058922544099
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1020,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.26641792123104
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1025,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.608844983451366
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1025,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.93840178323417
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 1027,
+      "zone_id": "office_1",
+      "user_id": "user_46",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1030,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.163163448054025
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1030,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.66314505692551
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 1030,
+      "zone_id": "meeting_1",
+      "user_id": "user_16",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1035,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.8364676442723
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1035,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.24592896392824
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1040,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.475282145533136
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1040,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.75035829767431
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 1042,
+      "zone_id": "meeting_1",
+      "user_id": "user_70",
+      "access_type": "exit"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1045,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.76824878762784
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1045,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.350795022648146
+    },
+    {
+      "type": "access_entry",
+      "timestamp": 1048,
+      "zone_id": "office_1",
+      "user_id": "user_30",
+      "access_type": "entry"
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1050,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.2623338397055
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1050,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.673778467097783
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 1051,
+      "zone_id": "office_1",
+      "duration_minutes": 28
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1055,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.864659670708406
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1055,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.76792007089985
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1060,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.636261519756445
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1060,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.01415758228735
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1065,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.24223109918386
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1065,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.29644109731229
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1070,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.750485833588773
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1070,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.575905182674653
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 1070,
+      "zone_id": "office_1",
+      "duration_minutes": 15
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 1073,
+      "zone_id": "office_1",
+      "duration_minutes": 12
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1075,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.039430130345313
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1075,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.643795726072362
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1080,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.646765256309216
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1080,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.2166786532537
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1085,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.129412083732497
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1085,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.295231418639897
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1090,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.07999959752212
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1090,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.73830390006421
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1095,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.10006099501686
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1095,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.067156160952145
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1100,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.385988876404106
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1100,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.311193306098517
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1105,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.31982250607653
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1105,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.667207253657207
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1110,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.945938141457358
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1110,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.813216460292846
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1115,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.328084066504296
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1115,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.676097127616885
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1120,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.810003165330222
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1120,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.837953032102586
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1125,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.21884131164042
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1125,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.831852205282814
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1130,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.0997914629654
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1130,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.97384278203955
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1135,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.000890663962394
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1135,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.105206479777227
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1140,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.88230879726217
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1140,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.098040630429093
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1145,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.865890747477252
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1145,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.238688552664048
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1150,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.80294703834865
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1150,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.726321469380444
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1155,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.87624772479822
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1155,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.286663025581216
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1160,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.96402249804939
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1160,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.286870951323376
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1165,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.75292395624229
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1165,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.426257235751784
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1170,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.134222669636138
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1170,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.248304630251027
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1175,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.084289843038462
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1175,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.84029324309061
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1180,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.21025276391078
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1180,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.278952501628357
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1185,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.717787534503312
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1185,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.065722804356284
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1190,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.829441366291558
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1190,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.458440552334853
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1195,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.986366072800518
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1195,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.586951179448388
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1200,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.424926296783195
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1200,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.17820944377563
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1205,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.68930634085496
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1205,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.61402745909283
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1210,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.568968046719732
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1210,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.378259205676642
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1215,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.66196444273524
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1215,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.079058691880668
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1220,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.212053324451105
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1220,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.505867928740024
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1225,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.200263389233342
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1225,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.64597344343283
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1230,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.066189021700744
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1230,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.327357145483294
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1235,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.03216294644019
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1235,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.008910793523143
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1240,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.74181998959767
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1240,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.9727855198269
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1245,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.1352008579733
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1245,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.282652712907794
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 1246,
+      "zone_id": "meeting_1",
+      "duration_minutes": 17
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1250,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.602203843341734
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1250,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.65401912415721
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1255,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.240819498727138
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1255,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.458470416368844
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1260,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.70211451913313
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1260,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.772819551017886
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1265,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.363501781410285
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1265,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.125861566619363
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1270,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.122400477964764
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1270,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.701099620715045
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1275,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.77366706678838
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1275,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.611705082864646
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1280,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.13512790816198
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1280,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.291102885835052
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1285,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.749823006338563
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1285,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.887153770516434
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1290,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.50940369260863
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1290,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.222366783617613
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1295,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.169308633833875
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1295,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.326373380710773
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1300,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.19848557316806
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1300,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.79233360680111
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1305,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.799776992914857
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1305,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.938609387994564
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1310,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.82976198004897
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1310,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.081795433318458
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1315,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.86193800455151
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1315,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.36538251064375
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 1316,
+      "zone_id": "office_1",
+      "duration_minutes": 25
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1320,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.94082774070761
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1320,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.516055241219135
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 1322,
+      "zone_id": "office_1",
+      "duration_minutes": 30
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1325,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.568567623247368
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1325,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.107424749031484
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1330,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.88450668421093
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1330,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.467350792130556
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1335,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.121868839418457
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1335,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.69916856718454
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1340,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.65677583589332
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1340,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.086011555559942
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 1342,
+      "zone_id": "meeting_1",
+      "duration_minutes": 19
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1345,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.378318847171034
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1345,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.094613059834707
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1350,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.70521909204635
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1350,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.440866762580406
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1355,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.58419840811655
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1355,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.56559540260816
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1360,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.701170359577922
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1360,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.135893509333588
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1365,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.661085372011858
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1365,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.473632661166313
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1370,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.76943002320461
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1370,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.94865355350276
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1375,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.745373101894405
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1375,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.094726319896893
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1380,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.957903880428987
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1380,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.441712382170856
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1385,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.2431173147079
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1385,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.370198548933185
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1390,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.263353270319566
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1390,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.649977289901184
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1395,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.00757803403497
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1395,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.20825289769266
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1400,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.41977052582438
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1400,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.73328314435286
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1405,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.36627278700236
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1405,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 21.882567736936622
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 1409,
+      "zone_id": "meeting_1",
+      "duration_minutes": 20
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1410,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.37727698286629
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1410,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.17517444019753
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1415,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.00054507914158
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1415,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.660754932380023
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1420,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.819079991193178
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1420,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.30559666190549
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1425,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.56445782494132
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1425,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.374260176708397
+    },
+    {
+      "type": "window_opened",
+      "timestamp": 1426,
+      "zone_id": "meeting_1",
+      "duration_minutes": 26
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1430,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 23.08520171253327
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1430,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.209433868882876
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1435,
+      "device_id": "temp_sensor_office_1",
+      "zone_id": "office_1",
+      "value": 22.986460267176952
+    },
+    {
+      "type": "temperature_reading",
+      "timestamp": 1435,
+      "device_id": "temp_sensor_meeting_1",
+      "zone_id": "meeting_1",
+      "value": 22.327774259596946
+    }
+  ],
+  "timestamp": "20250601_222457"
+}
