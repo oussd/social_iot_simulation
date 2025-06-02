@@ -73,7 +73,7 @@ class BuildingSimulation:
         self.active_jobs: Dict[str, BuildingJob] = {}
         self.processed_jobs: List[BuildingJob] = []
         self.job_queue: List[BuildingJob] = []  # Initialize job queue
-
+        
         # Initialize metrics
         self.metrics: Dict[str, Any] = {
             'framework_variant': framework_variant,
@@ -427,7 +427,7 @@ class BuildingSimulation:
         if params['behavior_profile'] == 'deceptive':
             params['deception_factor'] = random.uniform(*b_config['default_deception_factor_range'])
         return params
-        
+
     def _process_device_job(self, device: Device, job: BuildingJob):
         # ... (Logic is largely the same as BuildingSimulationComplex_V2's _process_device_job) ...
         if device.current_load >= device.max_load * 0.95:
@@ -610,8 +610,8 @@ class BuildingSimulation:
         for job in active_jobs:
             device = self._get_device_by_id(job.assigned_to_device_id)
             if device:
-                self._process_device_job(device, job)
-            else:
+                        self._process_device_job(device, job)
+            else: 
                 self.logger.log_warning(self.run_context_name, f"Job {job.id} assigned to non-existent device {job.assigned_to_device_id}")
                 job.status = "FAILED_INTERNAL"
                 self.metrics['jobs_failed_internal'] += 1
