@@ -70,9 +70,21 @@ class CompositeDevice(Device):
         if worker not in self.workers:
             self.workers.append(worker)
             self.log_info(f"Added worker {worker.nameShort()} to {self.nameShort()}'s pool.")
-            self.add_relationship(worker, "controller_for", initial_trust=0.7, policy_id="default_task_policy") 
-            if hasattr(worker, 'add_relationship'): 
-                worker.add_relationship(self, "work_for_me", initial_trust=0.7, policy_id="default_task_policy") 
+            # Establish bidirectional task-management relationships using the
+            # 'policy' parameter expected by Device.add_relationship.
+            self.add_relationship(
+                worker,
+                "controller_for",
+                initial_trust=0.7,
+                policy="default_task_policy",
+            )
+            if hasattr(worker, 'add_relationship'):
+                worker.add_relationship(
+                    self,
+                    "work_for_me",
+                    initial_trust=0.7,
+                    policy="default_task_policy",
+                )
 
     def _delegate_to_worker(self, sub_task_type: str, original_job_details: Dict, 
                               required_capability: str,

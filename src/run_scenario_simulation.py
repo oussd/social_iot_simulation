@@ -118,8 +118,14 @@ def _initialize_simulation_environment(
         device2 = devices_map.get(dev2_name)
 
         if device1 and device2 and rel_type:
-            device1.add_relationship(device2, rel_type, policy_id=policy_identifier) 
-            logger_instance.log_info("InitEnv", f"Added relationship: {dev1_name} --{rel_type}--> {dev2_name} (Policy/ID: {policy_identifier or 'None'})")
+            # Device.add_relationship expects the policy object or ID via the
+            # 'policy' parameter. Passing 'policy_id' causes a TypeError.
+            device1.add_relationship(device2, rel_type, policy=policy_identifier)
+            logger_instance.log_info(
+                "InitEnv",
+                f"Added relationship: {dev1_name} --{rel_type}--> {dev2_name}"
+                f" (Policy/ID: {policy_identifier or 'None'})",
+            )
         else:
             logger_instance.log_warning("InitEnv", f"Could not establish relationship due to missing devices or type: {rel_data}")
 
